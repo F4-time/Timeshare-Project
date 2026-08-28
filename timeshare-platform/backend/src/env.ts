@@ -4,7 +4,8 @@ import { z } from "zod";
 const schema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  ALLOWED_ORIGIN: z.string().url().default("http://localhost:5173"),
+  // Comma-separated: production domain plus any preview domains.
+  ALLOWED_ORIGIN: z.string().default("http://localhost:5173"),
   SUPABASE_URL: z.string().url(),
   SUPABASE_ANON_KEY: z.string().min(1),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
@@ -22,3 +23,7 @@ if (!parsed.success) {
 }
 
 export const env = parsed.data;
+
+export const allowedOrigins = env.ALLOWED_ORIGIN.split(",")
+  .map((o) => o.trim().replace(/\/$/, ""))
+  .filter(Boolean);
