@@ -312,6 +312,37 @@ null) so it can be called before any admin UI exists.
 
 ---
 
+## 21. Ledger lines point back at their reservation
+
+**Decision.** `entitlement_ledger` and `points_ledger` carry a `reservation_id`.
+
+**Why.** The clean-start baseline dropped this column, and the booking function
+failed on it. The fix could have been to stop writing it — but then a member sees
+that 3 nights left their balance with no way to know which booking took them,
+which defeats the purpose of keeping a ledger at all. The column went back in.
+
+The same pass restored read policies on both ledgers, which the baseline had left
+with RLS enabled and no policy — the third occurrence of that gap.
+
+**Cost.** None. The reference was always implied; now it is stored.
+
+---
+
+## 22. Verify function code against the live schema, not against memory
+
+**Decision.** Before running a migration, diff every column the code writes
+against PostgREST's OpenAPI spec, which lists the real columns of every table.
+
+**Why.** Two bugs in a row came from writing SQL against the *archived* schema
+rather than the live one: `RETURNS TABLE` name collisions, then a missing
+`reservation_id`. SQL has no compiler to catch this, and the errors only appear
+at execution. One diff found every remaining mismatch at once instead of a
+fix-run-fail loop.
+
+**Cost.** An extra check before each schema-touching change. Cheap.
+
+---
+
 ## Open questions
 
 - **Entitlement holds need a timeout.** The spec allows a 15-minute hold during

@@ -145,25 +145,37 @@ in the website, anyone could read it and fake successful payments.
   in points and rupees. It understands seasons: the same 3-night stay costs 1125
   points in peak season and 562.5 in off season. It refuses stays over 30 nights,
   dates in the past, and check-out before check-in.
+- **Booking works, end to end.** A member can be onboarded onto a plan, search,
+  and book. Tested against the real database: a member with 14 nights booked a
+  3-night stay, their balance became 11, the villa dropped out of availability,
+  cancelling gave the 3 nights back, and the ledger showed every movement.
+- **It cannot be oversold.** Eight people clicking "book" at the exact same
+  instant on four villas produced exactly four bookings and four polite refusals.
+  No villa was sold twice. This is enforced by the database, not by careful code.
 
 ## What does not work yet
 
-- **You cannot actually book anything.** Search can tell you a villa is free, but
-  nothing yet takes the villa off the shelf and spends your allowance.
-- No payments.
+- **No payment.** Bookings sit at "pending" — the allowance is held but no money
+  is taken, and nothing converts the hold into a completed stay.
+- **Nothing to click.** Search and booking exist only as an API. There is no
+  screen for a member to search or book.
+- **No admin screens.** Adding a resort or a villa still means a developer
+  writing SQL. Onboarding a member does too, though the function behind the
+  future button already exists.
 - No maintenance fee billing.
 - Member pages beyond the dashboard (my bookings, documents, profile).
 - Owner features (renting out, swapping).
-- Admin screens for managing resorts, members and contracts.
 - Individual resort detail pages.
-- The search is not on the website yet — it works, but only as an API.
 
 ## What is next
 
-The **booking commit**: turning a search result into a real reservation. That is
-steps 11 to 15 of the chain above — create the reservation, lock the nights, hold
-the allowance, take payment, confirm. It is the hardest part, because it has to be
-all-or-nothing even when two people click at the same moment.
+Two candidates, and they serve different audiences:
+
+**Admin screens** so the business can add its own resorts, villas and members
+without a developer. Right now a demo cannot show anyone adding inventory.
+
+**The booking screens** so a member can actually search and book from the
+website, rather than the engine only being reachable by API.
 
 ---
 
