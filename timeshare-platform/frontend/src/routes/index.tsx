@@ -132,7 +132,7 @@ function HomePage() {
               alt="Luxury resort villa with infinity pool overlooking the ocean"
               width={1600}
               height={1104}
-              className="h-[320px] w-full object-cover lg:h-[620px] lg:rounded-bl-[3rem]"
+              className="h-80 w-full object-cover lg:h-155 lg:rounded-bl-[3rem]"
             />
           </div>
         </div>
@@ -180,7 +180,7 @@ function HomePage() {
       </section>
 
       {/* Why timeshare */}
-      <section className="relative bg-gradient-to-b from-secondary/70 via-background to-secondary/40 py-20">
+      <section className="relative bg-linear-to-b from-secondary/70 via-background to-secondary/40 py-20">
         <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-14 px-6 lg:grid-cols-2">
           <div>
             <span className="mb-3 block text-[11px] font-semibold uppercase tracking-[0.25em] text-accent">
@@ -224,7 +224,7 @@ function HomePage() {
               width={1200}
               height={900}
               loading="lazy"
-              className="aspect-[4/3] w-full rounded-2xl object-cover shadow-lg"
+              className="aspect-4/3 w-full rounded-2xl object-cover shadow-lg"
             />
             <img
               src={alpine}
@@ -259,7 +259,7 @@ function HomePage() {
           {DESTINATIONS.map((d, i) => (
             <Reveal key={d.name} delay={i * 80}>
               <Link to="/resorts" className="group card-luxe overflow-hidden rounded-xl shadow-sm">
-                <div className="aspect-[4/3] overflow-hidden">
+                <div className="aspect-4/3 overflow-hidden">
                   <img
                     src={d.image}
                     alt={`${d.name} resort destination`}
@@ -281,7 +281,7 @@ function HomePage() {
 
       {/* Membership banner */}
       <section className="mx-auto max-w-7xl px-6 pb-20">
-        <Reveal className="shadow-luxe relative flex flex-col items-center justify-between gap-6 overflow-hidden rounded-2xl border border-accent/20 bg-gradient-to-br from-secondary via-background to-accent/25 px-8 py-10 md:flex-row">
+        <Reveal className="shadow-luxe relative flex flex-col items-center justify-between gap-6 overflow-hidden rounded-2xl border border-accent/20 bg-linear-to-br from-secondary via-background to-accent/25 px-8 py-10 md:flex-row">
           <div
             aria-hidden
             className="pointer-events-none absolute -top-24 -right-16 h-64 w-64 rounded-full bg-accent/20 blur-3xl"

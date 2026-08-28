@@ -71,7 +71,7 @@ function ResortsPage() {
         <div className="grid grid-cols-1 gap-x-7 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
           {resorts.map((resort) => (
             <article key={resort.id} className="group">
-              <div className="mb-5 aspect-[4/3] w-full overflow-hidden rounded-lg bg-muted shadow-luxe">
+              <div className="mb-5 aspect-4/3 w-full overflow-hidden rounded-lg bg-muted shadow-luxe">
                 <img
                   src={imageFor(resort.slug, resort.image_url)}
                   alt={`${resort.name} in ${resort.location ?? "India"}`}
