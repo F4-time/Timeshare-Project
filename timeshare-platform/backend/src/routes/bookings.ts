@@ -60,14 +60,8 @@ bookingRouter.post("/", requireAuth, async (req, res, next) => {
 
     if (error) throw bookingError(error.code, error.message);
 
-    const row = Array.isArray(data) ? data[0] : data;
-    res.status(201).json({
-      reservationId: row.reservation_id,
-      reference: row.reference,
-      pointsUsed: Number(row.points_used),
-      totalFees: Number(row.total_fees),
-      status: "pending",
-    });
+    // book_stay returns a jsonb object, already camelCase.
+    res.status(201).json(data);
   } catch (err) {
     next(err);
   }
