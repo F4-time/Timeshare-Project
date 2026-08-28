@@ -386,6 +386,39 @@ would lock everyone out of the platform permanently.
 
 ---
 
+## 26. Logins are recorded by the server, and never block sign-in
+
+**Decision.** After a successful sign-in the browser calls
+`POST /api/account/login-event`, which writes the row using the service role.
+The call is fire-and-forget.
+
+**Why.** IP address and user agent must come from the request, not from the
+client, or the audit trail records whatever the caller claims. `login_sessions`
+also grants only SELECT to authenticated users, so the insert needs the service
+role — exactly the kind of privileged write the API exists for.
+
+It is fire-and-forget because an analytics write must never stop someone logging
+in. If the API is down, the user still gets in and the row is simply missing.
+
+**Cost.** Sign-ins that happen while the API is unreachable go unrecorded. That
+is the right trade: losing a statistic beats locking out a customer.
+
+---
+
+## 27. Login history is joined in the application, not the database
+
+**Decision.** The analytics screen fetches `login_sessions`, then fetches the
+matching profiles and joins them in JavaScript.
+
+**Why.** `login_sessions.user_id` references `auth.users`, not `public.profiles`.
+PostgREST can only embed across a real foreign key, so asking for
+`profiles(full_name, email)` returns 400. The alternative — adding an FK to
+`profiles` — would duplicate a relationship auth already owns.
+
+**Cost.** Two queries instead of one, capped at 200 recent sign-ins.
+
+---
+
 ## Open questions
 
 - **Entitlement holds need a timeout.** The spec allows a 15-minute hold during

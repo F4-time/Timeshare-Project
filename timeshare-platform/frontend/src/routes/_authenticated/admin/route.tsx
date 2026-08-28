@@ -24,6 +24,7 @@ import { RouteError, RoutePending } from "@/components/RouteStates";
 
 const NAV: PortalNavItem[] = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { label: "Members", icon: Users },
   { label: "Owners", icon: KeyRound },
   { label: "Membership Plans", icon: BadgeCheck },
@@ -34,7 +35,7 @@ const NAV: PortalNavItem[] = [
   { label: "Maintenance Fees", icon: Wrench },
   { label: "Payments & Refunds", icon: Wallet },
   { label: "Support Tickets", icon: LifeBuoy },
-  { label: "Reports", icon: BarChart3 },
+  { label: "Reports", icon: ScrollText },
   { label: "Staff", icon: UserCog },
   { label: "Roles & Permissions", icon: ShieldCheck },
   { label: "Audit Log", icon: ScrollText },

@@ -4,6 +4,7 @@ import { Loader2, Lock, Mail, UserRound } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
+import { recordLogin } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -66,6 +67,7 @@ function AuthPage() {
         toast.error(error.message);
         return;
       }
+      recordLogin();
       navigate({ to: "/portal", replace: true });
     } catch (error) {
       toast.error(errorMessage(error));
@@ -93,6 +95,7 @@ function AuthPage() {
       }
       // Projects with email confirmation disabled return a session immediately.
       if (data.session) {
+        recordLogin();
         toast.success("Welcome to Forever Timeshare.");
         navigate({ to: "/portal", replace: true });
         return;

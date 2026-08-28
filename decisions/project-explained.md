@@ -156,6 +156,15 @@ in the website, anyone could read it and fake successful payments.
   real form: add a resort, define its room types (how many it sleeps, what it
   costs), and create villas in bulk. No developer needed. Each new villa gets a
   year of nightly availability automatically, so it is bookable immediately.
+- **There is an analytics screen.** How many people have registered, how many
+  have ever signed in, sign-ins in the last seven days, a bar chart of sign-ins
+  per day, how many resorts and villas exist, bookings by status, nights sold and
+  fees booked. Plus a recent sign-in list showing who, when, from which browser
+  and which IP address.
+
+One detail worth explaining: the booking figures deliberately exclude cancelled
+stays. So "10 reservations, 0 nights sold" is not a bug — it means all ten were
+cancelled. Counting them as sales would overstate the business.
 
 ## Who can log in as an admin
 
