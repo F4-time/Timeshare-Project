@@ -12,6 +12,7 @@ async function safe<T>(run: () => PromiseLike<T>, fallback: T): Promise<T> {
 }
 
 export type MemberOverview = {
+  planName: string | null;
   entitlementKind: "NIGHTS" | "POINTS" | null;
   entitlementBalance: number;
   upcomingCount: number;
@@ -21,6 +22,7 @@ export type MemberOverview = {
 
 export async function fetchMemberOverview(memberId: string | null): Promise<MemberOverview> {
   const empty: MemberOverview = {
+    planName: null,
     entitlementKind: null,
     entitlementBalance: 0,
     upcomingCount: 0,
@@ -29,7 +31,7 @@ export async function fetchMemberOverview(memberId: string | null): Promise<Memb
   };
   if (!memberId) return empty;
 
-  const [entitlements, upcoming, fees, documents] = await Promise.all([
+  const [entitlements, upcoming, fees, documents, planName] = await Promise.all([
     safe(
       async () =>
         (
@@ -74,6 +76,22 @@ export async function fetchMemberOverview(memberId: string | null): Promise<Memb
         ).count ?? 0,
       0,
     ),
+    safe(
+      async () => {
+        const { data } = await supabase
+          .from("membership_contracts")
+          .select("membership_plans(name)")
+          .eq("member_id", memberId)
+          .eq("status", "active")
+          .order("start_date", { ascending: false })
+          .limit(1);
+        // An untyped client types the embed as an array even though plan_id is many-to-one.
+        const embedded = data?.[0]?.membership_plans as unknown;
+        const plan = (Array.isArray(embedded) ? embedded[0] : embedded) as { name: string } | undefined;
+        return plan?.name ?? null;
+      },
+      null as string | null,
+    ),
   ]);
 
   const year = new Date().getFullYear();
@@ -92,6 +110,7 @@ export async function fetchMemberOverview(memberId: string | null): Promise<Memb
   );
 
   return {
+    planName,
     entitlementKind: (scope[0]?.kind as MemberOverview["entitlementKind"]) ?? null,
     entitlementBalance: balances.reduce((sum, b) => sum + b, 0),
     upcomingCount: upcoming,

@@ -42,7 +42,7 @@ function MemberDashboard() {
             <StatCard
               icon={BadgeCheck}
               label="Membership"
-              value={account?.member?.status ?? "Not linked"}
+              value={data?.planName ?? account?.member?.status ?? "Not linked"}
             />
             <StatCard
               icon={Palmtree}
@@ -83,6 +83,12 @@ function MemberDashboard() {
                 <InfoRow label="Roles" value={account?.roles.join(", ") || "—"} />
                 <InfoRow label="Documents" value={String(data?.documentCount ?? 0)} />
               </dl>
+              <Link
+                to="/member/membership"
+                className="mt-4 inline-block text-sm text-accent underline-offset-4 hover:underline"
+              >
+                View my membership
+              </Link>
             </aside>
           </div>
         </>
