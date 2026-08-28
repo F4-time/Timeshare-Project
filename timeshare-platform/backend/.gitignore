@@ -1,0 +1,9 @@
+node_modules
+dist
+
+# Local environment files — never commit credentials
+.env
+.env.*
+!.env.example
+
+*.log
