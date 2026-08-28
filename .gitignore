@@ -1,0 +1,55 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+.output
+.vinxi
+.tanstack/**
+.nitro
+*.local
+
+# Local environment files — never commit credentials
+.env
+.env.*
+!.env.example
+
+# Lovable reference app at the repo root — kept locally as a design reference,
+# not part of this repository. Leading "/" anchors these to the root only, so
+# timeshare-platform/frontend/{src,package.json,...} are unaffected.
+/.lovable/
+/.prettierignore
+/.prettierrc
+/AGENTS.md
+/bun.lock
+/bunfig.toml
+/components.json
+/eslint.config.js
+/package.json
+/public/
+/README.md
+/src/
+/tsconfig.json
+/vite.config.ts
+
+# Wrangler / Cloudflare
+.wrangler/
+.dev.vars
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
