@@ -152,6 +152,23 @@ in the website, anyone could read it and fake successful payments.
 - **It cannot be oversold.** Eight people clicking "book" at the exact same
   instant on four villas produced exactly four bookings and four polite refusals.
   No villa was sold twice. This is enforced by the database, not by careful code.
+- **Staff can add resorts and villas themselves.** There is an admin area with a
+  real form: add a resort, define its room types (how many it sleeps, what it
+  costs), and create villas in bulk. No developer needed. Each new villa gets a
+  year of nightly availability automatically, so it is bookable immediately.
+
+## Who can log in as an admin
+
+There is one login page for everyone. Your role decides where you land: members
+go to the member portal, staff to the admin area. A member who types the admin
+web address is refused — the block is enforced by the server, not just hidden in
+the menu.
+
+The very first administrator has to be created by hand, with a single database
+statement. That is deliberate: any "click here to become an admin" route that
+works without an existing admin is a way in for an attacker. After that, admins
+can promote each other, and the system refuses to remove the last one — otherwise
+everyone could be locked out permanently.
 
 ## What does not work yet
 

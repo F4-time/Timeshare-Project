@@ -343,6 +343,49 @@ fix-run-fail loop.
 
 ---
 
+## 23. Admin writes go straight to Supabase, not through the API
+
+**Decision.** The admin screens insert and update `resorts`, `room_types` and
+`resort_units` directly with the browser client.
+
+**Why.** RLS already restricts these tables to holders of `inventory.write`. A
+server hop would re-check the same thing the database is already enforcing and
+add a place for the two checks to disagree. The backend is reserved for what the
+browser genuinely cannot be trusted with: secrets and atomic transactions.
+
+**Cost.** Two write paths in the codebase. The rule is: if the database can
+enforce it, write directly; if it needs a secret or a transaction, use the API.
+
+---
+
+## 24. New units get their calendar from a trigger
+
+**Decision.** An `AFTER INSERT` trigger on `resort_units` generates 12 months of
+availability rows.
+
+**Why.** A unit with no availability rows can never be booked, and nothing about
+the admin screen explains why. Making the database do it means a villa is
+bookable the moment it exists. The units table also shows a red "nights open: 0"
+so the broken state is visible rather than mysterious.
+
+**Cost.** Fixed 12-month horizon. `extend_availability(resort, through)` pushes
+it further out when needed.
+
+---
+
+## 25. The first super admin must be created by hand
+
+**Decision.** `admin_set_role` requires the caller to already be a super admin,
+so the first one is inserted with SQL.
+
+**Why.** Any bootstrap that works without an existing admin is a privilege
+escalation path. The function also refuses to remove the last super admin, which
+would lock everyone out of the platform permanently.
+
+**Cost.** One manual SQL statement per environment, documented in the migration.
+
+---
+
 ## Open questions
 
 - **Entitlement holds need a timeout.** The spec allows a 15-minute hold during

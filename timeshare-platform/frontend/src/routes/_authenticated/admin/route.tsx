@@ -28,7 +28,7 @@ const NAV: PortalNavItem[] = [
   { label: "Owners", icon: KeyRound },
   { label: "Membership Plans", icon: BadgeCheck },
   { label: "Contracts", icon: FileSignature },
-  { label: "Resorts & Inventory", icon: Building2 },
+  { to: "/admin/resorts", label: "Resorts & Inventory", icon: Building2 },
   { label: "Availability Calendar", icon: CalendarRange },
   { label: "Bookings", icon: CalendarDays },
   { label: "Maintenance Fees", icon: Wrench },

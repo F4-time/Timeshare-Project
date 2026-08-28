@@ -26,6 +26,8 @@ import { Route as ResortsIndexRouteImport } from './routes/resorts.index'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
 import { Route as AuthenticatedMemberDashboardRouteImport } from './routes/_authenticated/member/dashboard'
 import { Route as AuthenticatedOwnerDashboardRouteImport } from './routes/_authenticated/owner/dashboard'
+import { Route as AuthenticatedAdminResortsIndexRouteImport } from './routes/_authenticated/admin/resorts.index'
+import { Route as AuthenticatedAdminResortsResortIdRouteImport } from './routes/_authenticated/admin/resorts.$resortId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -115,6 +117,18 @@ const AuthenticatedOwnerDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => AuthenticatedOwnerRouteRoute,
   } as any)
+const AuthenticatedAdminResortsIndexRoute =
+  AuthenticatedAdminResortsIndexRouteImport.update({
+    id: '/resorts/',
+    path: '/resorts/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminResortsResortIdRoute =
+  AuthenticatedAdminResortsResortIdRouteImport.update({
+    id: '/resorts/$resortId',
+    path: '/resorts/$resortId',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -133,6 +147,8 @@ export interface FileRoutesByFullPath {
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/member/dashboard': typeof AuthenticatedMemberDashboardRoute
   '/owner/dashboard': typeof AuthenticatedOwnerDashboardRoute
+  '/admin/resorts/$resortId': typeof AuthenticatedAdminResortsResortIdRoute
+  '/admin/resorts/': typeof AuthenticatedAdminResortsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -151,6 +167,8 @@ export interface FileRoutesByTo {
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/member/dashboard': typeof AuthenticatedMemberDashboardRoute
   '/owner/dashboard': typeof AuthenticatedOwnerDashboardRoute
+  '/admin/resorts/$resortId': typeof AuthenticatedAdminResortsResortIdRoute
+  '/admin/resorts': typeof AuthenticatedAdminResortsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -171,6 +189,8 @@ export interface FileRoutesById {
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/member/dashboard': typeof AuthenticatedMemberDashboardRoute
   '/_authenticated/owner/dashboard': typeof AuthenticatedOwnerDashboardRoute
+  '/_authenticated/admin/resorts/$resortId': typeof AuthenticatedAdminResortsResortIdRoute
+  '/_authenticated/admin/resorts/': typeof AuthenticatedAdminResortsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -191,6 +211,8 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/member/dashboard'
     | '/owner/dashboard'
+    | '/admin/resorts/$resortId'
+    | '/admin/resorts/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -209,6 +231,8 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/member/dashboard'
     | '/owner/dashboard'
+    | '/admin/resorts/$resortId'
+    | '/admin/resorts'
   id:
     | '__root__'
     | '/'
@@ -228,6 +252,8 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/dashboard'
     | '/_authenticated/member/dashboard'
     | '/_authenticated/owner/dashboard'
+    | '/_authenticated/admin/resorts/$resortId'
+    | '/_authenticated/admin/resorts/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -364,16 +390,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOwnerDashboardRouteImport
       parentRoute: typeof AuthenticatedOwnerRouteRoute
     }
+    '/_authenticated/admin/resorts/': {
+      id: '/_authenticated/admin/resorts/'
+      path: '/resorts'
+      fullPath: '/admin/resorts/'
+      preLoaderRoute: typeof AuthenticatedAdminResortsIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/resorts/$resortId': {
+      id: '/_authenticated/admin/resorts/$resortId'
+      path: '/resorts/$resortId'
+      fullPath: '/admin/resorts/$resortId'
+      preLoaderRoute: typeof AuthenticatedAdminResortsResortIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
+  AuthenticatedAdminResortsResortIdRoute: typeof AuthenticatedAdminResortsResortIdRoute
+  AuthenticatedAdminResortsIndexRoute: typeof AuthenticatedAdminResortsIndexRoute
 }
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
     AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
+    AuthenticatedAdminResortsResortIdRoute:
+      AuthenticatedAdminResortsResortIdRoute,
+    AuthenticatedAdminResortsIndexRoute: AuthenticatedAdminResortsIndexRoute,
   }
 
 const AuthenticatedAdminRouteRouteWithChildren =
