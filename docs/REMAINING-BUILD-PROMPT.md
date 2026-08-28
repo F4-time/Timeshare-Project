@@ -178,6 +178,15 @@ deployment.
 
 Do these in order. Later phases depend on earlier ones.
 
+> **Every phase has three completion criteria, not one:**
+>
+> 1. The feature works, verified against the live database.
+> 2. `decisions/flow.md` has a new numbered entry for every decision made.
+> 3. `decisions/project-explained.md` reflects the new reality in plain English.
+>
+> A phase with working code and stale documentation is **not done**.
+> Section 8 says exactly what to write and gives a template.
+
 ---
 
 ### Phase 1 — Admin: members and contracts
@@ -197,7 +206,8 @@ Build:
 Do not write new SQL for onboarding — the function exists and is tested.
 
 **Done when:** a brand-new signup can be onboarded onto a plan entirely through
-the UI, and immediately books a stay successfully.
+the UI, and immediately books a stay successfully. Then update both documents in
+`decisions/`.
 
 ---
 
@@ -221,7 +231,7 @@ check is the only thing standing between a stranger and a free confirmed
 booking. Reject anything that fails it, and make the check constant-time.
 
 **Done when:** a test-mode payment moves a reservation to `confirmed`, and a
-forged webhook is rejected.
+forged webhook is rejected. Then update both documents in `decisions/`.
 
 ---
 
@@ -235,7 +245,7 @@ Small but important, and it makes Phase 2 safe.
   positive ledger line, mark the reservation cancelled.
 
 **Done when:** an abandoned booking returns its villa and allowance
-automatically.
+automatically. Then update both documents in `decisions/`.
 
 ---
 
@@ -257,7 +267,8 @@ reuse the same ledger mechanism rather than inventing a parallel one.
 
 **Done when:** an owner can be given a contract and entitlement by SQL, and
 `book_stay` works for them. Extend `book_stay` to resolve an owner contract when
-the caller is an owner rather than a member.
+the caller is an owner rather than a member. Then update both documents in
+`decisions/`.
 
 ---
 
@@ -377,8 +388,9 @@ For every phase:
    proves nothing about whether a query returns the right rows.
 5. **Test the failure paths**, not only the happy one. Several bugs here appeared
    only when something was refused.
-6. **Update `decisions/flow.md` and `decisions/project-explained.md`** with what
-   you decided and why, including anything that turned out to be wrong.
+6. **Update `decisions/flow.md` and `decisions/project-explained.md`** in the
+   same commit as the code, following section 8. This is a completion criterion,
+   not an optional extra.
 7. **Commit and push per phase**, not per file.
 
 A note on verification, learned the hard way here: a test that passes while
@@ -386,3 +398,74 @@ testing the wrong thing is worse than a failing test. One concurrency test
 appeared to pass but had hit an unrelated limit before ever reaching the
 condition it was meant to prove. Check that a passing test could actually have
 failed.
+
+---
+
+## 8. Keeping the two documents current
+
+These are living documents. They are the reason someone joining in three months
+can be useful on day one instead of week three. **Update them in the same commit
+as the code**, not later — "later" never happens.
+
+### `decisions/flow.md` — the decision log
+
+For the engineers. One numbered entry per decision. Entries currently run to
+**29**, so the next one is 30. Never renumber existing entries; other documents
+and commit messages refer to them.
+
+Add an entry whenever you:
+- choose between two viable approaches,
+- do something that would look wrong or surprising to a reader,
+- discover a constraint the hard way,
+- or get something wrong and have to correct it.
+
+Do **not** add an entry for routine work. "Built the members list page" is not a
+decision. "Members list reads through the API instead of directly, because X" is.
+
+Template:
+
+```markdown
+## 30. Short statement of the decision
+
+**Decision.** What was actually done, in one or two sentences.
+
+**Why.** The reasoning. What breaks if you do it the obvious way instead. Name
+the alternative you rejected and why.
+
+**Cost.** What this makes harder or slower. Every real decision has one; if you
+cannot name it, the entry is probably describing a non-decision.
+```
+
+If you discover an earlier entry was wrong, do not silently edit it. Add a
+correction note to it, the way entry 8 records that the first version used the
+service key and would have disabled row security. The mistakes are the most
+valuable part of the file.
+
+Also maintain the **Open questions** section at the bottom: add anything you knew
+was imperfect and deferred, and delete items once genuinely resolved.
+
+### `decisions/project-explained.md` — the plain-English guide
+
+For non-engineers: the client, a project manager, a new joiner. No jargon. If a
+term is unavoidable, explain it in the sentence where it first appears.
+
+After each phase, update:
+- **"What works today"** — add what a person can now actually do, described from
+  their point of view, not the system's. "Members can book for themselves", not
+  "implemented POST /api/bookings".
+- **"What does not work yet"** — remove what you just built. Be honest about
+  what is still missing; an over-optimistic list here destroys the file's value.
+- **"What is next"** — point at the following phase.
+- The booking chain, vocabulary table, or "who can log in" sections if the
+  behaviour they describe has changed.
+
+Write numbers a reader can check. "Eight simultaneous booking attempts on four
+villas produced exactly four bookings" is worth more than "handles concurrency
+correctly", because the first can be disproved.
+
+### Also keep current
+
+- **`README.md`** — the status table, if a row's state changed.
+- **This file** — tick off completed phases and adjust later ones if what you
+  learned changes the plan.
+
