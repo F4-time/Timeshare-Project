@@ -35,11 +35,11 @@ export async function fetchMemberOverview(memberId: string | null): Promise<Memb
         (
           await supabase
             .from("entitlements")
-            .select("kind, total_units, year")
+            .select("id, kind, total_units, year")
             .eq("member_id", memberId)
             .order("year", { ascending: false })
         ).data ?? [],
-      [] as { kind: string; total_units: number; year: number }[],
+      [] as { id: string; kind: string; total_units: number; year: number }[],
     ),
     safe(
       async () =>
@@ -80,9 +80,20 @@ export async function fetchMemberOverview(memberId: string | null): Promise<Memb
   const current = entitlements.filter((e) => e.year === year);
   const scope = current.length ? current : entitlements.slice(0, 1);
 
+  // total_units is what was granted, not what remains. The real balance is the
+  // sum of the ledger, which entitlement_balance() computes.
+  const balances = await Promise.all(
+    scope.map((e) =>
+      safe(async () => {
+        const { data } = await supabase.rpc("entitlement_balance", { _entitlement_id: e.id });
+        return Number(data ?? 0);
+      }, 0),
+    ),
+  );
+
   return {
     entitlementKind: (scope[0]?.kind as MemberOverview["entitlementKind"]) ?? null,
-    entitlementBalance: scope.reduce((sum, e) => sum + Number(e.total_units), 0),
+    entitlementBalance: balances.reduce((sum, b) => sum + b, 0),
     upcomingCount: upcoming,
     duesAmount: fees.reduce(
       (sum, f) => sum + Math.max(0, Number(f.amount) + Number(f.late_fee) - Number(f.amount_paid)),

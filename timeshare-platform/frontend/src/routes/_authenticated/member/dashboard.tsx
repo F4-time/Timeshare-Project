@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { BadgeCheck, CalendarDays, FileText, Loader2, Palmtree, Wallet } from "lucide-react";
 
@@ -65,7 +65,13 @@ function MemberDashboard() {
             <section className="rounded-xl border border-border bg-background p-6 lg:col-span-2">
               <h2 className="font-serif text-lg">Next holiday</h2>
               <p className="mt-4 text-sm text-muted-foreground">
-                Nothing booked yet. Availability search opens once the booking engine is connected.
+                {data?.upcomingCount
+                  ? `You have ${data.upcomingCount} upcoming stay${data.upcomingCount === 1 ? "" : "s"}.`
+                  : "Nothing booked yet."}{" "}
+                <Link to="/member/holidays" className="text-accent underline-offset-4 hover:underline">
+                  Search availability
+                </Link>{" "}
+                to plan your next escape.
               </p>
             </section>
 

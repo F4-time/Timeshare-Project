@@ -166,6 +166,12 @@ One detail worth explaining: the booking figures deliberately exclude cancelled
 stays. So "10 reservations, 0 nights sold" is not a bug — it means all ten were
 cancelled. Counting them as sales would overstate the business.
 
+- **Members can now book for themselves.** Pick a destination, dates and guests,
+  see what is genuinely free with the price, and reserve it. The reservation
+  appears under "My bookings", the allowance is debited, and cancelling gives it
+  back. Everything a member sees is priced in their own currency — a nights plan
+  shows nights, a points plan shows points.
+
 ## Who can log in as an admin
 
 There is one login page for everyone. Your role decides where you land: members

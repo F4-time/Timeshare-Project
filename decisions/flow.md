@@ -419,6 +419,40 @@ PostgREST can only embed across a real foreign key, so asking for
 
 ---
 
+## 28. Balances are always read from the ledger, never from `total_units`
+
+**Decision.** Anywhere a balance is shown, it comes from
+`entitlement_balance(entitlement_id)`.
+
+**Why.** `entitlements.total_units` is what was *granted*. The dashboard was
+reading it and so displayed "14 nights available" to a member who had just spent
+three. The ledger sum is the only true balance.
+
+The bug hid behind a second one: the query selected `kind, total_units, year`
+but not `id`, so the RPC was called with `undefined` and returned null.
+`supabase-js` returns `{data: null, error}` rather than throwing, so the
+`safe()` wrapper turned a failed call into a confident `0`.
+
+**Cost.** One RPC per entitlement. The lesson is broader: a helper that converts
+errors into defaults will happily hide a real failure. Defaults are for absent
+data, not for broken queries.
+
+---
+
+## 29. Prices are shown in the member's own entitlement unit
+
+**Decision.** The search screen shows "3 nights" to a nights member and
+"1125 points" to a points member, based on their plan.
+
+**Why.** The availability API returns points for everyone, because pricing is a
+property of the room and season. But a Gold member is debited *nights*. Showing
+points to them describes a cost they will never be charged.
+
+**Cost.** The search screen needs the member's plan kind before it can render
+prices honestly.
+
+---
+
 ## Open questions
 
 - **Entitlement holds need a timeout.** The spec allows a 15-minute hold during

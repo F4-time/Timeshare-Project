@@ -25,7 +25,9 @@ import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated
 import { Route as ResortsIndexRouteImport } from './routes/resorts.index'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
+import { Route as AuthenticatedMemberBookingsRouteImport } from './routes/_authenticated/member/bookings'
 import { Route as AuthenticatedMemberDashboardRouteImport } from './routes/_authenticated/member/dashboard'
+import { Route as AuthenticatedMemberHolidaysRouteImport } from './routes/_authenticated/member/holidays'
 import { Route as AuthenticatedOwnerDashboardRouteImport } from './routes/_authenticated/owner/dashboard'
 import { Route as AuthenticatedAdminResortsIndexRouteImport } from './routes/_authenticated/admin/resorts.index'
 import { Route as AuthenticatedAdminResortsResortIdRouteImport } from './routes/_authenticated/admin/resorts.$resortId'
@@ -112,10 +114,22 @@ const AuthenticatedAdminDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedMemberBookingsRoute =
+  AuthenticatedMemberBookingsRouteImport.update({
+    id: '/bookings',
+    path: '/bookings',
+    getParentRoute: () => AuthenticatedMemberRouteRoute,
+  } as any)
 const AuthenticatedMemberDashboardRoute =
   AuthenticatedMemberDashboardRouteImport.update({
     id: '/dashboard',
     path: '/dashboard',
+    getParentRoute: () => AuthenticatedMemberRouteRoute,
+  } as any)
+const AuthenticatedMemberHolidaysRoute =
+  AuthenticatedMemberHolidaysRouteImport.update({
+    id: '/holidays',
+    path: '/holidays',
     getParentRoute: () => AuthenticatedMemberRouteRoute,
   } as any)
 const AuthenticatedOwnerDashboardRoute =
@@ -153,7 +167,9 @@ export interface FileRoutesByFullPath {
   '/resorts/': typeof ResortsIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/member/bookings': typeof AuthenticatedMemberBookingsRoute
   '/member/dashboard': typeof AuthenticatedMemberDashboardRoute
+  '/member/holidays': typeof AuthenticatedMemberHolidaysRoute
   '/owner/dashboard': typeof AuthenticatedOwnerDashboardRoute
   '/admin/resorts/$resortId': typeof AuthenticatedAdminResortsResortIdRoute
   '/admin/resorts/': typeof AuthenticatedAdminResortsIndexRoute
@@ -174,7 +190,9 @@ export interface FileRoutesByTo {
   '/resorts': typeof ResortsIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/member/bookings': typeof AuthenticatedMemberBookingsRoute
   '/member/dashboard': typeof AuthenticatedMemberDashboardRoute
+  '/member/holidays': typeof AuthenticatedMemberHolidaysRoute
   '/owner/dashboard': typeof AuthenticatedOwnerDashboardRoute
   '/admin/resorts/$resortId': typeof AuthenticatedAdminResortsResortIdRoute
   '/admin/resorts': typeof AuthenticatedAdminResortsIndexRoute
@@ -197,7 +215,9 @@ export interface FileRoutesById {
   '/resorts/': typeof ResortsIndexRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/_authenticated/member/bookings': typeof AuthenticatedMemberBookingsRoute
   '/_authenticated/member/dashboard': typeof AuthenticatedMemberDashboardRoute
+  '/_authenticated/member/holidays': typeof AuthenticatedMemberHolidaysRoute
   '/_authenticated/owner/dashboard': typeof AuthenticatedOwnerDashboardRoute
   '/_authenticated/admin/resorts/$resortId': typeof AuthenticatedAdminResortsResortIdRoute
   '/_authenticated/admin/resorts/': typeof AuthenticatedAdminResortsIndexRoute
@@ -220,7 +240,9 @@ export interface FileRouteTypes {
     | '/resorts/'
     | '/admin/analytics'
     | '/admin/dashboard'
+    | '/member/bookings'
     | '/member/dashboard'
+    | '/member/holidays'
     | '/owner/dashboard'
     | '/admin/resorts/$resortId'
     | '/admin/resorts/'
@@ -241,7 +263,9 @@ export interface FileRouteTypes {
     | '/resorts'
     | '/admin/analytics'
     | '/admin/dashboard'
+    | '/member/bookings'
     | '/member/dashboard'
+    | '/member/holidays'
     | '/owner/dashboard'
     | '/admin/resorts/$resortId'
     | '/admin/resorts'
@@ -263,7 +287,9 @@ export interface FileRouteTypes {
     | '/resorts/'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/dashboard'
+    | '/_authenticated/member/bookings'
     | '/_authenticated/member/dashboard'
+    | '/_authenticated/member/holidays'
     | '/_authenticated/owner/dashboard'
     | '/_authenticated/admin/resorts/$resortId'
     | '/_authenticated/admin/resorts/'
@@ -396,11 +422,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminDashboardRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/member/bookings': {
+      id: '/_authenticated/member/bookings'
+      path: '/bookings'
+      fullPath: '/member/bookings'
+      preLoaderRoute: typeof AuthenticatedMemberBookingsRouteImport
+      parentRoute: typeof AuthenticatedMemberRouteRoute
+    }
     '/_authenticated/member/dashboard': {
       id: '/_authenticated/member/dashboard'
       path: '/dashboard'
       fullPath: '/member/dashboard'
       preLoaderRoute: typeof AuthenticatedMemberDashboardRouteImport
+      parentRoute: typeof AuthenticatedMemberRouteRoute
+    }
+    '/_authenticated/member/holidays': {
+      id: '/_authenticated/member/holidays'
+      path: '/holidays'
+      fullPath: '/member/holidays'
+      preLoaderRoute: typeof AuthenticatedMemberHolidaysRouteImport
       parentRoute: typeof AuthenticatedMemberRouteRoute
     }
     '/_authenticated/owner/dashboard': {
@@ -449,12 +489,16 @@ const AuthenticatedAdminRouteRouteWithChildren =
   )
 
 interface AuthenticatedMemberRouteRouteChildren {
+  AuthenticatedMemberBookingsRoute: typeof AuthenticatedMemberBookingsRoute
   AuthenticatedMemberDashboardRoute: typeof AuthenticatedMemberDashboardRoute
+  AuthenticatedMemberHolidaysRoute: typeof AuthenticatedMemberHolidaysRoute
 }
 
 const AuthenticatedMemberRouteRouteChildren: AuthenticatedMemberRouteRouteChildren =
   {
+    AuthenticatedMemberBookingsRoute: AuthenticatedMemberBookingsRoute,
     AuthenticatedMemberDashboardRoute: AuthenticatedMemberDashboardRoute,
+    AuthenticatedMemberHolidaysRoute: AuthenticatedMemberHolidaysRoute,
   }
 
 const AuthenticatedMemberRouteRouteWithChildren =
