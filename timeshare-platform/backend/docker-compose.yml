@@ -1,0 +1,35 @@
+# Runs the API behind Caddy, which obtains and renews a Let's Encrypt
+# certificate automatically. The API itself is never exposed directly — only
+# Caddy binds to the host, on 80 and 443.
+services:
+  api:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    expose:
+      - "3000"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      # Set in .env, e.g. API_DOMAIN=api.yourdomain.com
+      API_DOMAIN: ${API_DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+
+volumes:
+  # Holds the issued certificates; losing this forces re-issuance and can hit
+  # Let's Encrypt rate limits.
+  caddy_data:
+  caddy_config:

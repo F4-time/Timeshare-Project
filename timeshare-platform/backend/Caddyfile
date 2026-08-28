@@ -1,0 +1,22 @@
+# Caddy obtains and renews the TLS certificate on its own; there is no certbot
+# step and no renewal cron to forget.
+{$API_DOMAIN} {
+	reverse_proxy api:3000
+
+	# Caddy terminates TLS, so the app sees the proxy address unless it trusts
+	# these headers. The backend sets `trust proxy` in production to match.
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	encode gzip
+	log {
+		output file /data/access.log {
+			roll_size 10MiB
+			roll_keep 5
+		}
+	}
+}
