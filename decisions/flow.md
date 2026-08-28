@@ -252,6 +252,66 @@ season prices at 1.0×. Stays are capped at 30 nights to bound the query.
 
 ---
 
+## 18. The booking commit is a single database function
+
+**Decision.** `book_stay(...)` is a plpgsql function. The API calls it once. All
+fifteen checks, the reservation, the calendar update and the ledger line happen
+inside it.
+
+**Why.** It has to be all-or-nothing. Supabase's REST interface has no
+transactions across calls, so doing this as six HTTP requests means a crash
+midway leaves the database lying: a villa held for a reservation that does not
+exist, or an allowance spent for a stay nobody has. One function is one
+transaction — any exception rolls back everything.
+
+It is `SECURITY DEFINER` and resolves the member from `auth.uid()` rather than
+accepting a member id. A caller therefore cannot book on someone else's behalf
+or spend another member's allowance, even by calling the function directly.
+
+**Cost.** Business logic lives in SQL, which is harder to unit-test and to read
+for a TypeScript developer. The tradeoff is deliberate: correctness under
+concurrency matters more here than developer familiarity.
+
+---
+
+## 19. Three independent guards against double-booking
+
+**Decision.** Selecting a free unit, the exclusion constraint, and a row-count
+check on the calendar update.
+
+**Why.** The `SELECT` finds a unit free on every night. Between that read and the
+write, another transaction may take it. The exclusion constraint on
+`reservation_items` then rejects the overlap. Finally the `UPDATE availability`
+counts the rows it changed and aborts if it is not exactly the number of nights,
+catching anything that slipped through.
+
+The API maps the resulting Postgres codes — `23P01` exclusion violation and
+`40001` serialization failure — to a plain 409 "those dates were just taken".
+A constraint violation here is an expected outcome, not a crash.
+
+**Cost.** Some redundancy. That is the point.
+
+---
+
+## 20. Onboarding is a function, not a script
+
+**Decision.** `admin_onboard_member(user_id, plan_id)` creates the member,
+contract, entitlement **and the opening ledger line** together.
+
+**Why.** Creating a member is four related writes, and the easiest to forget is
+the ledger line. Balances are summed from the ledger and never stored, so a
+member created without one has an allowance of zero and cannot book — with no
+obvious cause. Wrapping it means it cannot be half-done.
+
+Written now because the booking engine needed a real member to test against, but
+it is the same function the admin "onboard member" screen will call. Test
+scaffolding and production code are the same path.
+
+**Cost.** None meaningful. It permits the service role (where `auth.uid()` is
+null) so it can be called before any admin UI exists.
+
+---
+
 ## Open questions
 
 - **Entitlement holds need a timeout.** The spec allows a 15-minute hold during
