@@ -86,72 +86,72 @@ function HomePage() {
   return (
     <main>
       {/* Hero */}
-      <section className="gradient-hero relative overflow-hidden">
-        <div className="grid grid-cols-1 items-center lg:grid-cols-2">
-          <div className="order-2 px-6 py-14 lg:order-1 lg:py-24 lg:pl-[max(1.5rem,calc((100vw-80rem)/2))] lg:pr-16">
-            <span className="mb-4 block text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
+      <section className="gradient-hero relative">
+        <div className="grid grid-cols-1 items-stretch lg:grid-cols-2">
+          <div className="order-2 w-full px-[clamp(1rem,4vw,4rem)] py-10 sm:py-14 lg:order-1 lg:flex lg:flex-col lg:justify-center lg:py-20 xl:py-24">
+            <span className="mb-3 block text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground sm:mb-4 sm:text-[11px]">
               Own <span className="text-accent">more than a holiday</span>
             </span>
-            <h1 className="font-display text-5xl leading-[1.05] md:text-6xl">
+            <h1 className="font-display text-[2.35rem] leading-[1.08] sm:text-5xl md:text-6xl xl:text-7xl">
               Your Holiday.
               <br />
               <span className="text-gold italic">Your Forever.</span>
             </h1>
-            <p className="mt-6 max-w-md text-base leading-relaxed text-muted-foreground">
+            <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:mt-6 sm:text-base lg:max-w-2xl">
               Forever Timeshare gives you the freedom to holiday every year at the world's most
               beautiful destinations with the people you love.
             </p>
-            <div className="mt-8 flex flex-wrap gap-4">
+            <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:gap-4">
               <Link
                 to="/membership"
-                className="inline-flex items-center gap-2 shine hover-lift gradient-gold rounded-full px-7 py-3.5 text-sm font-semibold text-accent-foreground shadow-luxe"
+                className="inline-flex items-center justify-center gap-2 shine hover-lift gradient-gold rounded-full px-6 py-3 text-sm font-semibold text-accent-foreground shadow-luxe sm:px-7 sm:py-3.5"
               >
                 Discover Memberships <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 to="/resorts"
-                className="inline-flex items-center gap-2 rounded-full border border-primary/20 px-7 py-3.5 text-sm font-semibold transition-colors hover:bg-secondary"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-primary/20 px-6 py-3 text-sm font-semibold transition-colors hover:bg-secondary sm:px-7 sm:py-3.5"
               >
                 Explore Destinations <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-            <ul className="mt-8 flex flex-wrap gap-x-8 gap-y-3 text-sm text-muted-foreground">
+            <ul className="mt-6 flex flex-col gap-2 text-sm text-muted-foreground sm:mt-8 sm:flex-row sm:flex-wrap sm:gap-x-8 sm:gap-y-3">
               {["Verified Resorts", "Best Price Guarantee", "Dedicated Member Support"].map(
                 (item) => (
                   <li key={item} className="flex items-center gap-2">
-                    <BadgeCheck className="h-4 w-4 text-accent" />
+                    <BadgeCheck className="h-4 w-4 shrink-0 text-accent" />
                     {item}
                   </li>
                 ),
               )}
             </ul>
           </div>
-          <div className="order-1 lg:order-2">
+          <div className="order-1 min-h-0 lg:order-2">
             <img
               src={heroVilla}
               alt="Luxury resort villa with infinity pool overlooking the ocean"
               width={1600}
               height={1104}
-              className="h-80 w-full object-cover lg:h-155 lg:rounded-bl-[3rem]"
+              className="h-56 w-full object-cover sm:h-80 lg:h-full lg:min-h-[32rem] lg:rounded-bl-[3rem] xl:min-h-[38rem]"
             />
           </div>
         </div>
 
-        {/* Search bar */}
-        <div className="mx-auto -mt-8 max-w-7xl px-6 lg:-mt-14">
-          <div className="grid grid-cols-1 gap-4 card-luxe rounded-2xl p-5 shadow-luxe md:grid-cols-2 lg:grid-cols-5">
+        <div className="site-wrap relative z-20 -mt-6 sm:-mt-8 lg:-mt-12">
+          <div className="relative z-20 grid grid-cols-1 gap-3 rounded-2xl border border-accent/20 bg-card p-4 shadow-luxe sm:gap-4 sm:p-5 md:grid-cols-2 lg:grid-cols-5">
             {SEARCH_FIELDS.map((field) => (
-              <div key={field.label} className="flex items-center gap-3 px-2">
+              <div key={field.label} className="flex items-center gap-3 px-1 sm:px-2">
                 <field.icon className="h-5 w-5 shrink-0 text-accent" />
-                <div className="leading-tight">
-                  <div className="text-xs text-muted-foreground">{field.label}</div>
-                  <div className="text-sm font-medium">{field.value}</div>
+                <div className="min-w-0 leading-tight">
+                  <div className="truncate text-xs text-muted-foreground">{field.label}</div>
+                  <div className="truncate text-sm font-medium">{field.value}</div>
                 </div>
               </div>
             ))}
+
             <Link
               to="/resorts"
-              className="inline-flex items-center justify-center gap-2 shine gradient-ink rounded-xl px-6 py-4 text-sm font-semibold text-primary-foreground transition-transform hover:-translate-y-0.5"
+              className="inline-flex items-center justify-center gap-2 shine gradient-ink rounded-xl px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg sm:py-4 md:col-span-2 lg:col-span-1"
             >
               <Search className="h-4 w-4" /> Search Availability
             </Link>
@@ -160,13 +160,13 @@ function HomePage() {
       </section>
 
       {/* Benefit strip */}
-      <section className="mx-auto max-w-7xl px-6 py-16">
-        <div className="grid grid-cols-2 gap-y-10 md:grid-cols-3 lg:grid-cols-6">
+      <section className="site-wrap py-12 sm:py-16">
+        <div className="grid grid-cols-2 gap-x-2 gap-y-8 sm:gap-y-10 md:grid-cols-3 lg:grid-cols-6">
           {BENEFITS.map((b, i) => (
             <Reveal
               key={b.title}
               delay={i * 70}
-              className={`group px-4 text-center ${i !== 0 ? "lg:border-l lg:border-accent/20" : ""}`}
+              className={`group px-2 text-center sm:px-4 ${i !== 0 ? "lg:border-l lg:border-accent/20" : ""}`}
             >
               <b.icon
                 className="mx-auto mb-3 h-8 w-8 text-accent transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-110"
@@ -180,18 +180,18 @@ function HomePage() {
       </section>
 
       {/* Why timeshare */}
-      <section className="relative bg-linear-to-b from-secondary/70 via-background to-secondary/40 py-20">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-14 px-6 lg:grid-cols-2">
+      <section className="relative overflow-x-clip bg-linear-to-b from-secondary/70 via-background to-secondary/40 py-14 sm:py-20">
+        <div className="site-wrap grid grid-cols-1 items-center gap-10 sm:gap-14 lg:grid-cols-2">
           <div>
             <span className="mb-3 block text-[11px] font-semibold uppercase tracking-[0.25em] text-accent">
               Why Timeshare?
             </span>
-            <h2 className="font-display text-4xl leading-tight md:text-5xl">
+            <h2 className="font-display text-3xl leading-tight sm:text-4xl md:text-5xl">
               A Smarter Way
               <br />
               to <span className="text-gold italic">Holiday</span>
             </h2>
-            <p className="mt-5 max-w-md text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-5 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
               Our vacation ownership programme gives you the right to enjoy luxurious holidays every
               year at a fraction of the cost of regular vacations.
             </p>
@@ -217,7 +217,7 @@ function HomePage() {
               How It Works <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="relative">
+          <div className="relative mb-10 sm:mb-6 lg:mb-0">
             <img
               src={lifestyleFamily}
               alt="Family walking together on a tropical beach"
@@ -232,9 +232,9 @@ function HomePage() {
               width={900}
               height={700}
               loading="lazy"
-              className="absolute -right-4 -bottom-10 hidden w-48 rounded-2xl border-4 border-background object-cover shadow-xl lg:block"
+              className="absolute right-3 -bottom-8 hidden w-36 rounded-2xl border-4 border-background object-cover shadow-xl sm:block lg:right-0 lg:w-48 xl:-right-2"
             />
-            <div className="absolute -bottom-8 left-6 flex items-center gap-3 rounded-xl bg-card px-5 py-4 shadow-xl">
+            <div className="absolute -bottom-6 left-3 flex items-center gap-3 rounded-xl bg-card px-4 py-3 shadow-xl sm:-bottom-8 sm:left-6 sm:px-5 sm:py-4">
               <Users className="h-7 w-7 text-accent" strokeWidth={1.5} />
               <div className="leading-tight">
                 <div className="font-display text-xl">20,000+</div>
@@ -246,16 +246,16 @@ function HomePage() {
       </section>
 
       {/* Destinations */}
-      <section className="mx-auto max-w-7xl px-6 py-20">
-        <Reveal className="mb-10 text-center">
+      <section className="site-wrap py-14 sm:py-20">
+        <Reveal className="mb-8 text-center sm:mb-10">
           <span className="ornament mb-3 text-[11px] font-semibold uppercase tracking-[0.25em] text-accent">
             Popular Destinations
           </span>
-          <h2 className="font-display text-4xl md:text-5xl">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl">
             Explore <span className="text-gold italic">Dream</span> Destinations
           </h2>
         </Reveal>
-        <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-7">
+        <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
           {DESTINATIONS.map((d, i) => (
             <Reveal key={d.name} delay={i * 80}>
               <Link to="/resorts" className="group card-luxe overflow-hidden rounded-xl shadow-sm">
@@ -280,8 +280,8 @@ function HomePage() {
       </section>
 
       {/* Membership banner */}
-      <section className="mx-auto max-w-7xl px-6 pb-20">
-        <Reveal className="shadow-luxe relative flex flex-col items-center justify-between gap-6 overflow-hidden rounded-2xl border border-accent/20 bg-linear-to-br from-secondary via-background to-accent/25 px-8 py-10 md:flex-row">
+      <section className="site-wrap pb-14 sm:pb-20">
+        <Reveal className="shadow-luxe relative flex flex-col items-center justify-between gap-6 overflow-hidden rounded-2xl border border-accent/20 bg-linear-to-br from-secondary via-background to-accent/25 px-5 py-8 sm:px-8 sm:py-10 md:flex-row">
           <div
             aria-hidden
             className="pointer-events-none absolute -top-24 -right-16 h-64 w-64 rounded-full bg-accent/20 blur-3xl"
@@ -294,7 +294,7 @@ function HomePage() {
               <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.25em] text-accent">
                 Membership Plans
               </span>
-              <h2 className="font-display text-3xl">Choose a Plan That Suits You</h2>
+              <h2 className="font-display text-2xl sm:text-3xl">Choose a Plan That Suits You</h2>
               <p className="mt-2 text-sm text-muted-foreground">
                 Flexible plans for every lifestyle and every family.
               </p>
@@ -302,7 +302,7 @@ function HomePage() {
           </div>
           <Link
             to="/membership"
-            className="inline-flex shrink-0 items-center gap-2 shine hover-lift gradient-gold rounded-full px-7 py-3.5 text-sm font-semibold text-accent-foreground shadow-luxe"
+            className="inline-flex w-full shrink-0 items-center justify-center gap-2 shine hover-lift gradient-gold rounded-full px-7 py-3.5 text-sm font-semibold text-accent-foreground shadow-luxe sm:w-auto"
           >
             View Membership Plans <ArrowRight className="h-4 w-4" />
           </Link>
@@ -310,8 +310,8 @@ function HomePage() {
       </section>
 
       {/* Stats */}
-      <section className="mx-auto max-w-7xl px-6 pb-10">
-        <Reveal className="card-luxe grid grid-cols-2 gap-y-8 rounded-2xl px-6 py-8 shadow-luxe md:grid-cols-3 lg:grid-cols-5">
+      <section className="site-wrap pb-10">
+        <Reveal className="card-luxe grid grid-cols-2 gap-y-6 rounded-2xl px-4 py-6 shadow-luxe sm:gap-y-8 sm:px-6 sm:py-8 md:grid-cols-3 lg:grid-cols-5">
           {STATS.map((s, i) => (
             <div
               key={s.label}

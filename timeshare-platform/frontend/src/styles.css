@@ -151,9 +151,15 @@
     border-color: var(--color-border);
   }
 
+  html {
+    overflow-x: clip;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    min-width: 0;
+    overflow-x: clip;
   }
 }
 
@@ -250,10 +256,12 @@
     box-shadow 0.4s ease,
     border-color 0.4s ease;
 
-  &:hover {
-    transform: translateY(-6px);
-    border-color: color-mix(in oklab, var(--accent) 45%, transparent);
-    box-shadow: 0 26px 55px -30px color-mix(in oklab, var(--primary) 45%, transparent);
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      transform: translateY(-6px);
+      border-color: color-mix(in oklab, var(--accent) 45%, transparent);
+      box-shadow: 0 26px 55px -30px color-mix(in oklab, var(--primary) 45%, transparent);
+    }
   }
 }
 
@@ -292,6 +300,13 @@
       color-mix(in oklab, var(--accent) 75%, transparent)
     );
   }
+}
+
+@utility site-wrap {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+  padding-inline: clamp(1rem, 4vw, 4rem);
 }
 
 @utility hover-lift {

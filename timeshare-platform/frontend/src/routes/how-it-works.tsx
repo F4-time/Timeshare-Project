@@ -35,15 +35,15 @@ const OWNER_CHAIN = ["Ownership", "Entitlement", "Use · Rent · Exchange · Tra
 
 function Chain({ title, steps }: { title: string; steps: string[] }) {
   return (
-    <div className="border border-primary/5 bg-card p-10">
+    <div className="border border-primary/5 bg-card p-6 sm:p-10">
       <h2 className="font-display text-2xl">{title}</h2>
       <ol className="mt-8 space-y-4">
         {steps.map((step, i) => (
           <li key={step} className="flex items-baseline gap-4">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-accent">
+            <span className="shrink-0 text-[10px] font-bold uppercase tracking-widest text-accent">
               {String(i + 1).padStart(2, "0")}
             </span>
-            <span className="text-sm uppercase tracking-widest">{step}</span>
+            <span className="min-w-0 text-sm uppercase tracking-widest">{step}</span>
           </li>
         ))}
       </ol>

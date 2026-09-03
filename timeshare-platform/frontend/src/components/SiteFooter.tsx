@@ -19,8 +19,8 @@ const SUPPORT = [
 
 export function SiteFooter() {
   return (
-    <footer className="mt-16 border-t border-border bg-secondary/60 sm:mt-24">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-12 sm:px-6 md:grid-cols-2 lg:grid-cols-5 lg:py-14">
+    <footer className="mt-12 border-t border-border bg-secondary/60 sm:mt-24">
+      <div className="site-wrap grid grid-cols-1 gap-10 py-10 sm:py-12 md:grid-cols-2 lg:grid-cols-5 lg:py-14">
         <div className="lg:col-span-2">
           <div className="mb-4 flex items-center gap-4">
             <img
@@ -29,7 +29,7 @@ export function SiteFooter() {
               className="h-12 w-auto shrink-0 mix-blend-multiply sm:h-14"
             />
             <span className="flex flex-col leading-tight">
-              <span className="font-serif text-xl font-semibold tracking-tight text-primary sm:text-2xl">
+              <span className="font-serif text-lg font-semibold tracking-tight text-primary sm:text-2xl">
                 Forever Timeshare
               </span>
               <span className="mt-1 whitespace-nowrap text-[10px] font-medium uppercase tracking-[0.25em] text-accent sm:text-[11px] sm:tracking-[0.3em]">

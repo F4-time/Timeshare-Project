@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
 import { PageShell } from "@/components/PageShell";
@@ -9,6 +9,8 @@ const plansQuery = queryOptions({
   queryKey: ["public-plans"],
   queryFn: listMembershipPlans,
 });
+
+type MembershipPlan = Awaited<ReturnType<typeof listMembershipPlans>>[number];
 
 export const Route = createFileRoute("/membership")({
   head: () => ({
@@ -46,17 +48,25 @@ function MembershipPage() {
         ) : (
           <div className="grid grid-cols-1 gap-6 bg-transparent md:grid-cols-2 xl:grid-cols-4">
             {plans.map((plan) => (
-              <div 
-                key={plan.id} 
-                className="flex flex-col bg-card p-8 border border-border rounded-lg shadow-md hover:shadow-xl hover:border-accent/50 transition-all duration-300 hover:scale-105 hover:-translate-y-1 cursor-pointer group"
+              <div
+                key={plan.id}
+                className="group flex flex-col rounded-lg border border-border bg-card p-8 shadow-md transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:border-accent/50 hover:shadow-xl"
               >
                 <p className="text-xs uppercase tracking-widest text-accent group-hover:text-accent/80 transition-colors">
                   {plan.benefits?.cadence ?? plan.benefits?.tier ?? plan.benefits?.code ?? "Plan"}
                 </p>
-                <h2 className="mt-2 font-display text-2xl group-hover:text-accent transition-colors duration-300">{plan.name}</h2>
+                <h2 className="mt-2 font-display text-2xl transition-colors duration-300 group-hover:text-accent">
+                  {plan.name}
+                </h2>
                 {plan.benefits?.tagline ? (
-                  <p className="mt-2 text-base text-muted-foreground group-hover:text-foreground/80 transition-colors">{plan.benefits.tagline}</p>
+                  <p className="mt-2 text-base text-muted-foreground transition-colors group-hover:text-foreground/80">
+                    {plan.benefits.tagline}
+                  </p>
                 ) : null}
+                <p className="mt-4 text-lg font-medium">
+                  {entitlementLabel(plan)}{" "}
+                  <span className="text-sm text-muted-foreground">every year</span>
+                </p>
                 <ul className="mt-6 flex-1 space-y-3 text-sm text-muted-foreground">
                   {(plan.benefits?.items ?? []).map((b) => (
                     <li key={b.label} className="flex gap-2 group/item">
@@ -67,8 +77,17 @@ function MembershipPage() {
                       </span>
                     </li>
                   ))}
+                  {plan.benefits?.booking_window_days ? (
+                    <li className="flex gap-2 group/item">
+                      <span className="transition-colors group-hover/item:text-accent">•</span>
+                      <span>
+                        {plan.benefits.booking_window_days}-day booking window ·{" "}
+                        {plan.benefits.perpetual ? "perpetual" : `${plan.duration_years}-year term`}
+                      </span>
+                    </li>
+                  ) : null}
                 </ul>
-                <p className="mt-8 border-t border-border pt-6 text-xs uppercase tracking-widest text-accent group-hover:text-accent/80 transition-colors">
+                <p className="mt-8 border-t border-border pt-6 text-xs uppercase tracking-widest text-accent transition-colors group-hover:text-accent/80">
                   {money(plan.price, plan.currency)}
                   {plan.maintenance_fee
                     ? ` · ${money(plan.maintenance_fee, plan.currency)} annual upkeep`
@@ -272,16 +291,22 @@ function MembershipPage() {
             <p className="text-base text-muted-foreground mb-6 group-hover:text-foreground/80 transition-colors">
               Tell us how you travel and we will match you to the right membership.
             </p>
-            <a
-              href="/contact"
+            <Link
+              to="/contact"
               className="inline-flex items-center gap-2 px-8 py-3 bg-amber-600 text-white rounded-full hover:bg-amber-700 hover:shadow-lg hover:scale-105 transition-all duration-300 font-semibold transform active:scale-95"
             >
               Calculate My Plan
               <span className="text-lg">→</span>
-            </a>
+            </Link>
           </div>
         </div>
       </section>
     </>
   );
+}
+
+function entitlementLabel(plan: MembershipPlan) {
+  if (plan.annual_nights) return `${plan.annual_nights} nights`;
+  if (plan.annual_points) return `${plan.annual_points.toLocaleString("en-IN")} Forever Credits`;
+  return "Flexible entitlement";
 }

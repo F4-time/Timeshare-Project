@@ -45,7 +45,7 @@ function AboutPage() {
     >
       <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
         {PILLARS.map((item) => (
-          <div key={item.h} className="border border-primary/5 bg-card p-8">
+          <div key={item.h} className="border border-primary/5 bg-card p-5 sm:p-8">
             <h2 className="font-display text-xl">{item.h}</h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.p}</p>
           </div>

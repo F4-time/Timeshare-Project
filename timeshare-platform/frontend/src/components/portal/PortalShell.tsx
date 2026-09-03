@@ -128,9 +128,9 @@ export function PortalShell({
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
               {initialsOf(account)}
             </span>
-            <Button variant="ghost" size="sm" onClick={signOut}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign out
+            <Button variant="ghost" size="sm" onClick={signOut} className="shrink-0 px-2 sm:px-3">
+              <LogOut className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Sign out</span>
             </Button>
           </div>
         </header>
@@ -151,7 +151,7 @@ export function PortalPage({
   children?: ReactNode;
 }) {
   return (
-    <div className="mx-auto w-full max-w-6xl">
+    <div className="w-full">
       <h1 className="font-serif text-2xl sm:text-3xl">{title}</h1>
       {description && <p className="mt-2 text-sm text-muted-foreground">{description}</p>}
       <div className="mt-6">{children}</div>

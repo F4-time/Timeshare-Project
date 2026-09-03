@@ -61,7 +61,7 @@ function OffersPage() {
         {OFFERS.map((offer) => (
           <article
             key={offer.title}
-            className="rounded-2xl border border-border bg-card p-8 transition-shadow hover:shadow-lg"
+            className="rounded-2xl border border-border bg-card p-5 transition-shadow hover:shadow-lg sm:p-8"
           >
             <div className="flex items-center gap-3">
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-accent">
@@ -77,14 +77,14 @@ function OffersPage() {
         ))}
       </div>
 
-      <div className="mt-12 flex flex-col items-start gap-4 rounded-2xl border border-border bg-secondary/50 p-8 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-12 flex flex-col items-stretch gap-4 rounded-2xl border border-border bg-secondary/50 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-8">
         <div>
           <h2 className="font-display text-2xl">Ready to choose a plan?</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Compare tiers, entitlements and booking windows side by side.
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row">
           <Button asChild>
             <Link to="/membership">View membership plans</Link>
           </Button>
