@@ -21,6 +21,10 @@ dist-ssr
 .env.*
 !.env.example
 
+# SSH key pairs — never commit private keys
+*.pem
+*.ppk
+
 # Lovable reference app at the repo root — kept locally as a design reference,
 # not part of this repository. Leading "/" anchors these to the root only, so
 # timeshare-platform/frontend/{src,package.json,...} are unaffected.
