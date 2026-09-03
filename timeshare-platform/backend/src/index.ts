@@ -39,6 +39,10 @@ app.get("/health", (_req, res) => {
   res.json({ ok: true, env: env.NODE_ENV, time: new Date().toISOString() });
 });
 
+app.get("/", (_req, res) => {
+  res.json({ name: "Forever Timeshare API", status: "ok" });
+});
+
 app.use("/api/account", accountRouter);
 app.use("/api/availability", availabilityRouter);
 app.use("/api/bookings", bookingRouter);
