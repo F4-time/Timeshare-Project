@@ -138,7 +138,7 @@ function AuthPage() {
 
   return (
     <main className="gradient-hero">
-      <div className="mx-auto flex max-w-md flex-col px-6 py-16">
+      <div className="mx-auto flex w-full max-w-md flex-col px-4 py-10 sm:px-6 sm:py-16">
         <div className="mb-8 text-center">
           <img
             src={emblem}

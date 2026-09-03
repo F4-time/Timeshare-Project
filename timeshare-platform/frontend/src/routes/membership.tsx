@@ -43,9 +43,9 @@ function MembershipPage() {
           Our membership tiers are being updated. Please check back shortly.
         </p>
       ) : (
-        <div className="grid grid-cols-1 gap-px bg-border md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-px overflow-hidden rounded-xl bg-border md:grid-cols-2 lg:grid-cols-4">
           {plans.map((plan) => (
-            <div key={plan.id} className="flex flex-col bg-card p-8">
+            <div key={plan.id} className="flex flex-col bg-card p-5 sm:p-8">
               <p className="text-xs uppercase tracking-widest text-accent">
                 {plan.benefits?.tier ?? plan.benefits?.code ?? "Plan"}
               </p>
