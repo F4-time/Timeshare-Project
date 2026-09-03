@@ -121,28 +121,28 @@ SELECT v.name, v.description, v.price, v.currency, v.duration_years,
 FROM (VALUES
   ('Silver Escape', 'Entry tier with fixed annual nights across our domestic estates.',
    295000::numeric, 'INR', 10, NULL::int, 7::numeric, 18000::numeric,
-   '{"tier": "Silver", "code": "SILVER", "booking_window_days": 180, "items": [
+   '{"cadence": "Daily", "tagline": "Night-by-night getaways", "tier": "Silver", "code": "SILVER", "booking_window_days": 180, "items": [
       {"label": "7 nights every year", "detail": "Studio and one-bedroom units across our domestic estates"},
       {"label": "6-month booking window", "detail": "Reserve up to 180 days ahead of your stay"},
       {"label": "Family of four included", "detail": "Two adults and two children on every stay"}]}'::jsonb,
    true),
   ('Gold Retreat', 'Domestic plus select international stays with flexible splitting.',
    545000::numeric, 'INR', 15, NULL::int, 14::numeric, 26000::numeric,
-   '{"tier": "Gold", "code": "GOLD", "booking_window_days": 270, "items": [
+   '{"cadence": "Weekly", "tagline": "Full-week family holidays", "tier": "Gold", "code": "GOLD", "booking_window_days": 270, "items": [
       {"label": "14 nights every year", "detail": "One and two-bedroom suites, domestic plus select international"},
       {"label": "9-month booking window", "detail": "Reserve up to 270 days ahead for peak season"},
       {"label": "Split your stays", "detail": "Use your nights across multiple trips each year"}]}'::jsonb,
    true),
   ('Platinum Points', 'Points-based flexibility across seasons, room types and destinations.',
    895000::numeric, 'INR', 25, 30000, NULL::numeric, 38000::numeric,
-   '{"tier": "Platinum", "code": "PLATINUM", "booking_window_days": 365, "items": [
+   '{"cadence": "Monthly", "tagline": "Extended monthly stays", "tier": "Platinum", "code": "PLATINUM", "booking_window_days": 365, "items": [
       {"label": "30,000 points a year", "detail": "Spend across seasons, room types and destinations"},
       {"label": "12-month booking window", "detail": "First access to festive and peak inventory"},
       {"label": "Exchange and rental access", "detail": "Deposit unused points or list your week"}]}'::jsonb,
    true),
   ('Signature Residence', 'Residence-grade inventory with perpetual tenure and concierge.',
    1750000::numeric, 'INR', 99, 60000, NULL::numeric, 62000::numeric,
-   '{"tier": "Signature", "code": "SIGNATURE", "booking_window_days": 365, "perpetual": true, "items": [
+   '{"cadence": "Yearly", "tagline": "The full-year legacy membership", "tier": "Signature", "code": "SIGNATURE", "booking_window_days": 365, "perpetual": true, "items": [
       {"label": "60,000 points a year", "detail": "Residence-grade inventory and private villas"},
       {"label": "Perpetual membership", "detail": "No fixed term - pass it on to your family"},
       {"label": "Dedicated concierge", "detail": "Personal holiday planner and in-resort host"}]}'::jsonb,

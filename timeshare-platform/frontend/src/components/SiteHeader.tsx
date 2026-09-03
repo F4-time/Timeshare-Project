@@ -1,9 +1,15 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Phone, UserRound, Menu } from "lucide-react";
+import { Phone, UserRound, Menu, ChevronDown } from "lucide-react";
 
 import { useAuthSession } from "@/hooks/useAuthSession";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import emblem from "@/assets/ft-emblem.png";
 
 const NAV = [
@@ -14,6 +20,12 @@ const NAV = [
   { to: "/offers", label: "Offers" },
   { to: "/about", label: "About Us" },
   { to: "/faq", label: "FAQ" },
+] as const;
+
+const PLAN_LINKS = [
+  { to: "/forever-city", label: "Forever City" },
+  { to: "/forever-holidays", label: "Forever Holidays" },
+  { to: "/forever-business", label: "Forever Business" },
 ] as const;
 
 export function SiteHeader() {
@@ -51,6 +63,25 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
+
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-1 pb-1 outline-none transition-colors hover:text-accent data-[state=open]:text-accent">
+              Plan
+              <ChevronDown className="h-3.5 w-3.5" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="min-w-[10rem]">
+              {PLAN_LINKS.map((item) => (
+                <DropdownMenuItem key={item.to} asChild>
+                  <Link
+                    to={item.to}
+                    activeProps={{ className: "text-accent" }}
+                  >
+                    {item.label}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div className="flex items-center gap-3 sm:gap-5">
@@ -93,6 +124,22 @@ export function SiteHeader() {
                     {item.label}
                   </Link>
                 ))}
+
+                <p className="mt-4 px-3 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  Plan
+                </p>
+                {PLAN_LINKS.map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setOpen(false)}
+                    className="rounded-md px-3 py-3 text-base font-medium transition-colors hover:bg-secondary hover:text-accent"
+                    activeProps={{ className: "bg-secondary text-accent" }}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+
                 <Link
                   to="/contact"
                   onClick={() => setOpen(false)}

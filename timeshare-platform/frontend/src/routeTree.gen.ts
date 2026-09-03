@@ -15,6 +15,9 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as ForeverBusinessRouteImport } from './routes/forever-business'
+import { Route as ForeverCityRouteImport } from './routes/forever-city'
+import { Route as ForeverHolidaysRouteImport } from './routes/forever-holidays'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as OffersRouteImport } from './routes/offers'
@@ -60,6 +63,21 @@ const ContactRoute = ContactRouteImport.update({
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForeverBusinessRoute = ForeverBusinessRouteImport.update({
+  id: '/forever-business',
+  path: '/forever-business',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForeverCityRoute = ForeverCityRouteImport.update({
+  id: '/forever-city',
+  path: '/forever-city',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForeverHolidaysRoute = ForeverHolidaysRouteImport.update({
+  id: '/forever-holidays',
+  path: '/forever-holidays',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HowItWorksRoute = HowItWorksRouteImport.update({
@@ -164,6 +182,9 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
+  '/forever-business': typeof ForeverBusinessRoute
+  '/forever-city': typeof ForeverCityRoute
+  '/forever-holidays': typeof ForeverHolidaysRoute
   '/how-it-works': typeof HowItWorksRoute
   '/membership': typeof MembershipRoute
   '/offers': typeof OffersRoute
@@ -188,6 +209,9 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
+  '/forever-business': typeof ForeverBusinessRoute
+  '/forever-city': typeof ForeverCityRoute
+  '/forever-holidays': typeof ForeverHolidaysRoute
   '/how-it-works': typeof HowItWorksRoute
   '/membership': typeof MembershipRoute
   '/offers': typeof OffersRoute
@@ -214,6 +238,9 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
+  '/forever-business': typeof ForeverBusinessRoute
+  '/forever-city': typeof ForeverCityRoute
+  '/forever-holidays': typeof ForeverHolidaysRoute
   '/how-it-works': typeof HowItWorksRoute
   '/membership': typeof MembershipRoute
   '/offers': typeof OffersRoute
@@ -240,6 +267,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contact'
     | '/faq'
+    | '/forever-business'
+    | '/forever-city'
+    | '/forever-holidays'
     | '/how-it-works'
     | '/membership'
     | '/offers'
@@ -264,6 +294,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contact'
     | '/faq'
+    | '/forever-business'
+    | '/forever-city'
+    | '/forever-holidays'
     | '/how-it-works'
     | '/membership'
     | '/offers'
@@ -289,6 +322,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contact'
     | '/faq'
+    | '/forever-business'
+    | '/forever-city'
+    | '/forever-holidays'
     | '/how-it-works'
     | '/membership'
     | '/offers'
@@ -315,6 +351,9 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
+  ForeverBusinessRoute: typeof ForeverBusinessRoute
+  ForeverCityRoute: typeof ForeverCityRoute
+  ForeverHolidaysRoute: typeof ForeverHolidaysRoute
   HowItWorksRoute: typeof HowItWorksRoute
   MembershipRoute: typeof MembershipRoute
   OffersRoute: typeof OffersRoute
@@ -363,6 +402,27 @@ declare module '@tanstack/react-router' {
       path: '/faq'
       fullPath: '/faq'
       preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forever-business': {
+      id: '/forever-business'
+      path: '/forever-business'
+      fullPath: '/forever-business'
+      preLoaderRoute: typeof ForeverBusinessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forever-city': {
+      id: '/forever-city'
+      path: '/forever-city'
+      fullPath: '/forever-city'
+      preLoaderRoute: typeof ForeverCityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forever-holidays': {
+      id: '/forever-holidays'
+      path: '/forever-holidays'
+      fullPath: '/forever-holidays'
+      preLoaderRoute: typeof ForeverHolidaysRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/how-it-works': {
@@ -566,6 +626,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
+  ForeverBusinessRoute: ForeverBusinessRoute,
+  ForeverCityRoute: ForeverCityRoute,
+  ForeverHolidaysRoute: ForeverHolidaysRoute,
   HowItWorksRoute: HowItWorksRoute,
   MembershipRoute: MembershipRoute,
   OffersRoute: OffersRoute,

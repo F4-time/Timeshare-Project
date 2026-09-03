@@ -16,6 +16,14 @@ export type PlanBenefit = { label: string; detail?: string };
 export type PlanBenefits = {
   tier?: string;
   code?: string;
+  cadence?: string;
+  tagline?: string;
+  stay_length?: string;
+  credits?: string;
+  credit_carry_forward?: string;
+  guests?: string;
+  cancellation?: string;
+  best_for?: string;
   booking_window_days?: number;
   perpetual?: boolean;
   items?: PlanBenefit[];

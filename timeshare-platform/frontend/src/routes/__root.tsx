@@ -43,10 +43,14 @@ function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const chromeless =
     pathname.startsWith("/auth") ||
-    pathname.startsWith("/member") ||
-    pathname.startsWith("/owner") ||
-    pathname.startsWith("/admin") ||
-    pathname.startsWith("/portal");
+    pathname === "/member" ||
+    pathname.startsWith("/member/") ||
+    pathname === "/owner" ||
+    pathname.startsWith("/owner/") ||
+    pathname === "/admin" ||
+    pathname.startsWith("/admin/") ||
+    pathname === "/portal" ||
+    pathname.startsWith("/portal/");
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;

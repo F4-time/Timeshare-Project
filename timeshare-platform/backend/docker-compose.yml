@@ -20,7 +20,7 @@ services:
       - "443:443"
     environment:
       # Set in .env, e.g. API_DOMAIN=api.yourdomain.com
-      API_DOMAIN: ${API_DOMAIN}
+      API_DOMAIN: ${API_DOMAIN}de4
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

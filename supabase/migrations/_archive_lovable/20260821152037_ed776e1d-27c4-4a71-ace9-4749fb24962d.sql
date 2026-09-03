@@ -234,9 +234,9 @@ insert into public.membership_benefits (plan_id, label, detail, sort_order)
 select p.id, b.label, b.detail, b.sort_order
 from public.membership_plans p
 join (values
-  ('SILVER', '7 nights every year', 'Studio and one-bedroom units across our domestic estates', 1),
-  ('SILVER', '6-month booking window', 'Reserve up to 180 days ahead of your stay', 2),
-  ('SILVER', 'Family of four included', 'Two adults and two children on every stay', 3),
+  ('SILVER', 'Night-by-night getaways', '15 nights every membership year', 1),
+  ('SILVER', 'Earn 1,200 credits per night stayed', 2),
+  ('SILVER', '180-day booking window', '₹2,95,000 · ₹18,000 annual upkeep', 3),
   ('GOLD', '14 nights every year', 'One and two-bedroom suites, domestic plus select international', 1),
   ('GOLD', '9-month booking window', 'Reserve up to 270 days ahead for peak season', 2),
   ('GOLD', 'Split your stays', 'Use your nights across multiple trips each year', 3),
