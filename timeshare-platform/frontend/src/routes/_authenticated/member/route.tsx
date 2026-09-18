@@ -1,7 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import {
   CalendarDays,
-  FileText,
   LayoutDashboard,
   LifeBuoy,
   Palmtree,
@@ -20,9 +19,8 @@ const NAV: PortalNavItem[] = [
   { to: "/member/holidays", label: "Book a Holiday", icon: Palmtree },
   { to: "/member/bookings", label: "My Bookings", icon: CalendarDays },
   { label: "Payments & Fees", icon: Wallet },
-  { label: "Documents", icon: FileText },
-  { label: "Profile", icon: UserRound },
-  { label: "Support", icon: LifeBuoy },
+  { to: "/member/profile", label: "Profile", icon: UserRound },
+  { to: "/member/support", label: "Support", icon: LifeBuoy },
 ];
 
 export const Route = createFileRoute("/_authenticated/member")({

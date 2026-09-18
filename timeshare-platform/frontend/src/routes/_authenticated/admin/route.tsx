@@ -1,22 +1,5 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import {
-  BadgeCheck,
-  BarChart3,
-  Building2,
-  CalendarDays,
-  CalendarRange,
-  FileSignature,
-  KeyRound,
-  LayoutDashboard,
-  LifeBuoy,
-  ScrollText,
-  Settings,
-  ShieldCheck,
-  UserCog,
-  Users,
-  Wallet,
-  Wrench,
-} from "lucide-react";
+import { BarChart3, Building2, LayoutDashboard, LifeBuoy, Users } from "lucide-react";
 
 import { PortalShell, type PortalNavItem } from "@/components/portal/PortalShell";
 import { RoleGate } from "@/components/portal/RoleGate";
@@ -25,21 +8,9 @@ import { RouteError, RoutePending } from "@/components/RouteStates";
 const NAV: PortalNavItem[] = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
-  { label: "Members", icon: Users },
-  { label: "Owners", icon: KeyRound },
-  { label: "Membership Plans", icon: BadgeCheck },
-  { label: "Contracts", icon: FileSignature },
+  { to: "/admin/members", label: "Members", icon: Users },
   { to: "/admin/resorts", label: "Resorts & Inventory", icon: Building2 },
-  { label: "Availability Calendar", icon: CalendarRange },
-  { label: "Bookings", icon: CalendarDays },
-  { label: "Maintenance Fees", icon: Wrench },
-  { label: "Payments & Refunds", icon: Wallet },
-  { label: "Support Tickets", icon: LifeBuoy },
-  { label: "Reports", icon: ScrollText },
-  { label: "Staff", icon: UserCog },
-  { label: "Roles & Permissions", icon: ShieldCheck },
-  { label: "Audit Log", icon: ScrollText },
-  { label: "Settings", icon: Settings },
+  { to: "/admin/support", label: "Support", icon: LifeBuoy },
 ];
 
 export const Route = createFileRoute("/_authenticated/admin")({

@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -8,10 +8,12 @@ import { toast } from "sonner";
 import { PortalPage } from "@/components/portal/PortalShell";
 import { RouteError } from "@/components/RouteStates";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAccount } from "@/hooks/useAccount";
 import { listResorts } from "@/lib/catalogue";
+import { fetchMyMembership } from "@/lib/membership";
 import { fetchMemberOverview } from "@/lib/portal-queries";
 import {
   createBooking,
@@ -32,6 +34,7 @@ export const Route = createFileRoute("/_authenticated/member/holidays")({
 function HolidaysPage() {
   const { data: account } = useAccount();
   const qc = useQueryClient();
+  const navigate = useNavigate();
 
   const resorts = useQuery({ queryKey: ["public-resorts"], queryFn: listResorts });
 
@@ -43,6 +46,11 @@ function HolidaysPage() {
     queryFn: () => fetchMemberOverview(memberId),
     enabled: account !== undefined,
   });
+  const membership = useQuery({
+    queryKey: ["my-membership", memberId],
+    queryFn: () => fetchMyMembership(memberId),
+    enabled: account !== undefined,
+  });
   const isPoints = overview.data?.entitlementKind === "POINTS";
 
   const [resortId, setResortId] = useState("");
@@ -52,6 +60,7 @@ function HolidaysPage() {
   const [children, setChildren] = useState(0);
   const [result, setResult] = useState<SearchResult | null>(null);
   const [confirmed, setConfirmed] = useState<{ reference: string; fees: number } | null>(null);
+  const [pendingOption, setPendingOption] = useState<RoomOption | null>(null);
 
   const effectiveResortId = resortId || resorts.data?.[0]?.id || "";
 
@@ -79,21 +88,37 @@ function HolidaysPage() {
     onSuccess: async (data) => {
       setConfirmed({ reference: data.reference, fees: data.totalFees });
       setResult(null);
+      setPendingOption(null);
       await qc.invalidateQueries({ queryKey: ["my-bookings"] });
       await qc.invalidateQueries({ queryKey: ["member-overview"] });
       toast.success(`Booked — ${data.reference}`);
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => {
+      setPendingOption(null);
+      toast.error(e.message);
+    },
   });
 
   const noMembership = account && !account.member;
+
+  function handleReserve(option: RoomOption) {
+    if (noMembership) {
+      toast.error("Please choose a plan first — you haven't selected a membership plan yet.");
+      navigate({ to: "/membership" });
+      return;
+    }
+    setPendingOption(option);
+  }
 
   return (
     <PortalPage title="Book a holiday" description="Search the collection and reserve your stay.">
       {noMembership && (
         <div className="mb-6 rounded-xl border border-dashed border-border bg-background p-6 text-sm text-muted-foreground">
-          No membership is linked to your account yet, so bookings will be refused. Contact the
-          concierge to have your contract activated.
+          No membership is linked to your account yet.{" "}
+          <Link to="/membership" className="text-accent underline-offset-4 hover:underline">
+            Choose a plan
+          </Link>{" "}
+          to unlock bookings.
         </div>
       )}
 
@@ -275,10 +300,12 @@ function HolidaysPage() {
 
                   <Button
                     className="mt-5 w-full"
-                    disabled={book.isPending || Boolean(noMembership)}
-                    onClick={() => book.mutate(o)}
+                    disabled={book.isPending && book.variables?.roomTypeId === o.roomTypeId}
+                    onClick={() => handleReserve(o)}
                   >
-                    {book.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {book.isPending && book.variables?.roomTypeId === o.roomTypeId && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
                     Reserve this
                   </Button>
                 </article>
@@ -287,6 +314,84 @@ function HolidaysPage() {
           )}
         </section>
       )}
+
+      <Dialog open={Boolean(pendingOption)} onOpenChange={(open) => !open && setPendingOption(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm your booking</DialogTitle>
+          </DialogHeader>
+
+          {pendingOption && result && (
+            <div className="rounded-lg border border-border p-4 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="font-serif text-base">{pendingOption.name}</span>
+                <span className="text-xs uppercase tracking-widest text-muted-foreground">
+                  {result.resort.name}
+                </span>
+              </div>
+              <dl className="mt-3 space-y-1.5">
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground">Dates</dt>
+                  <dd>
+                    {formatDate(result.checkIn)} – {formatDate(result.checkOut)}
+                  </dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground">Guests</dt>
+                  <dd>
+                    {adults} adult{adults === 1 ? "" : "s"}
+                    {children ? `, ${children} child${children === 1 ? "" : "ren"}` : ""}
+                  </dd>
+                </div>
+                <div className="mt-2 flex justify-between border-t border-border pt-2">
+                  <dt className="text-muted-foreground">
+                    {isPoints ? "Points to deduct" : "Nights to deduct"}
+                  </dt>
+                  <dd className="font-medium">
+                    {isPoints
+                      ? `${pendingOption.points} points`
+                      : `${result.nights} night${result.nights === 1 ? "" : "s"}`}
+                  </dd>
+                </div>
+                <div className="flex justify-between text-base font-medium">
+                  <dt>Fees payable</dt>
+                  <dd>{inr.format(pendingOption.fee)}</dd>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <dt className="text-muted-foreground">Remaining amount owed (after this booking)</dt>
+                  <dd>{inr.format((membership.data?.remainingFees ?? 0) + pendingOption.fee)}</dd>
+                </div>
+              </dl>
+              <p className="mt-3 text-xs text-muted-foreground">
+                This amount will be deducted from your selected plan once you confirm.
+              </p>
+            </div>
+          )}
+
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => setPendingOption(null)}
+              disabled={book.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="w-full"
+              disabled={book.isPending}
+              onClick={() => pendingOption && book.mutate(pendingOption)}
+            >
+              {book.isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Check className="mr-2 h-4 w-4" />
+              )}
+              Confirm Booking
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </PortalPage>
   );
 }

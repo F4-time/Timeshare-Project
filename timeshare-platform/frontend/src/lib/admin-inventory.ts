@@ -14,6 +14,7 @@ export type AdminResort = {
   location: string | null;
   country: string | null;
   image_url: string | null;
+  amenities: { items?: string[] } | null;
 };
 
 export type AdminRoomType = {
@@ -44,7 +45,7 @@ function assertOk(error: { message: string } | null) {
 export async function listResortsAdmin(): Promise<AdminResort[]> {
   const { data, error } = await supabase
     .from("resorts")
-    .select("id, slug, name, description, location, country, image_url")
+    .select("id, slug, name, description, location, country, image_url, amenities")
     .order("name");
   assertOk(error);
   return (data ?? []) as AdminResort[];
@@ -53,7 +54,7 @@ export async function listResortsAdmin(): Promise<AdminResort[]> {
 export async function getResort(id: string): Promise<AdminResort | null> {
   const { data, error } = await supabase
     .from("resorts")
-    .select("id, slug, name, description, location, country, image_url")
+    .select("id, slug, name, description, location, country, image_url, amenities")
     .eq("id", id)
     .maybeSingle();
   assertOk(error);
@@ -68,9 +69,15 @@ export type ResortInput = {
   country: string;
   description: string;
   image_url: string;
+  /** Comma-separated list; split into the `amenities.items` JSON array on save. */
+  amenities: string;
 };
 
 export async function saveResort(input: ResortInput) {
+  const amenityItems = input.amenities
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
   const payload = {
     name: input.name.trim(),
     slug: input.slug.trim().toLowerCase(),
@@ -78,11 +85,25 @@ export async function saveResort(input: ResortInput) {
     country: input.country.trim() || "India",
     description: input.description.trim() || null,
     image_url: input.image_url.trim() || null,
+    amenities: { items: amenityItems },
   };
   const { error } = input.id
     ? await supabase.from("resorts").update(payload).eq("id", input.id)
     : await supabase.from("resorts").insert(payload);
   assertOk(error);
+}
+
+/** Uploads an image to the public `resort-images` bucket and returns its public URL. */
+export async function uploadResortImage(file: File, slug: string): Promise<string> {
+  const ext = file.name.split(".").pop() || "jpg";
+  const path = `${slug || "resort"}/${Date.now()}.${ext}`;
+  const { error } = await supabase.storage.from("resort-images").upload(path, file, {
+    cacheControl: "3600",
+    upsert: true,
+  });
+  assertOk(error);
+  const { data } = supabase.storage.from("resort-images").getPublicUrl(path);
+  return data.publicUrl;
 }
 
 export async function listRoomTypes(resortId: string): Promise<AdminRoomType[]> {

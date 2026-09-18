@@ -18,7 +18,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { listResortsAdmin, saveResort, type AdminResort, type ResortInput } from "@/lib/admin-inventory";
+import {
+  listResortsAdmin,
+  saveResort,
+  uploadResortImage,
+  type AdminResort,
+  type ResortInput,
+} from "@/lib/admin-inventory";
 
 const resortsQuery = queryOptions({
   queryKey: ["admin-resorts"],
@@ -40,6 +46,7 @@ const EMPTY: ResortInput = {
   country: "India",
   description: "",
   image_url: "",
+  amenities: "",
 };
 
 function slugify(value: string) {
@@ -58,6 +65,7 @@ function ResortDialog({
 }) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState<ResortInput>(
     resort
       ? {
@@ -68,9 +76,26 @@ function ResortDialog({
           country: resort.country ?? "India",
           description: resort.description ?? "",
           image_url: resort.image_url ?? "",
+          amenities: resort.amenities?.items?.join(", ") ?? "",
         }
       : EMPTY,
   );
+
+  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setUploading(true);
+    try {
+      const url = await uploadResortImage(file, form.slug || slugify(form.name));
+      setForm((f) => ({ ...f, image_url: url }));
+      toast.success("Image uploaded");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   const mutation = useMutation({
     mutationFn: () => saveResort(form),
@@ -154,12 +179,32 @@ function ResortDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="image">Image URL</Label>
+            <Label htmlFor="amenities">Amenities</Label>
+            <Input
+              id="amenities"
+              value={form.amenities}
+              onChange={(e) => setForm((f) => ({ ...f, amenities: e.target.value }))}
+              placeholder="Pool, Spa, Free Wifi, Bonfire lawn"
+            />
+            <p className="text-xs text-muted-foreground">Comma-separated list, shown as tags to members.</p>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="image">Image</Label>
+            {form.image_url && (
+              <img
+                src={form.image_url}
+                alt="Resort preview"
+                className="mb-2 h-32 w-full rounded-md object-cover"
+              />
+            )}
+            <Input id="image-upload" type="file" accept="image/*" onChange={handleFileSelect} disabled={uploading} />
+            {uploading && <p className="text-xs text-muted-foreground">Uploading…</p>}
             <Input
               id="image"
               value={form.image_url}
               onChange={(e) => setForm((f) => ({ ...f, image_url: e.target.value }))}
-              placeholder="https://…"
+              placeholder="https://… (or upload a file above)"
             />
             <p className="text-xs text-muted-foreground">
               Leave blank to use the bundled artwork matched by slug.

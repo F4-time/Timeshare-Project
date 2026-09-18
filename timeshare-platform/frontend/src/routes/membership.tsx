@@ -1,8 +1,15 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { queryOptions, useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 import { PageShell } from "@/components/PageShell";
 import { RouteError, RoutePending } from "@/components/RouteStates";
+import { AuthPromptDialog } from "@/components/AuthPromptDialog";
+import { Button } from "@/components/ui/button";
+import { useAccount } from "@/hooks/useAccount";
+import { enrollInPlan, fetchMyMembership } from "@/lib/membership";
 import { listMembershipPlans, money } from "@/lib/catalogue";
 
 const plansQuery = queryOptions({
@@ -33,6 +40,50 @@ export const Route = createFileRoute("/membership")({
 
 function MembershipPage() {
   const { data: plans } = useSuspenseQuery(plansQuery);
+  const account = useAccount();
+  const qc = useQueryClient();
+  const navigate = useNavigate();
+  const [authPromptOpen, setAuthPromptOpen] = useState(false);
+
+  const memberId = account.data?.member?.id ?? null;
+  // account.data.member only says the account has *some* membership — fetch the
+  // actual contract so only that one plan's card shows as enrolled, not all of them.
+  const myMembership = useQuery({
+    queryKey: ["my-membership", memberId],
+    queryFn: () => fetchMyMembership(memberId),
+    enabled: Boolean(memberId),
+  });
+  const currentPlanId = myMembership.data?.contract?.plan?.id ?? null;
+
+  const enroll = useMutation({
+    mutationFn: (planId: string) => enrollInPlan(planId),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ["my-membership"] });
+      await qc.invalidateQueries({ queryKey: ["account"] });
+      toast.success("Membership activated — your allowance is ready to use.");
+      navigate({ to: "/member/membership" });
+    },
+    onError: (e: Error) => {
+      toast.error(e.message);
+    },
+  });
+
+  function handleChoosePlan(planId: string) {
+    if (account.isLoading) return;
+    if (account.isError || !account.data) {
+      // Cached auth state can be briefly stale right after login — re-verify before
+      // assuming the visitor is signed out.
+      account.refetch().then((result) => {
+        if (!result.data) {
+          setAuthPromptOpen(true);
+          return;
+        }
+        enroll.mutate(planId);
+      });
+      return;
+    }
+    enroll.mutate(planId);
+  }
 
   return (
     <>
@@ -93,6 +144,22 @@ function MembershipPage() {
                     ? ` · ${money(plan.maintenance_fee, plan.currency)} annual upkeep`
                     : ""}
                 </p>
+                {currentPlanId === plan.id ? (
+                  <Button asChild variant="outline" className="mt-4 w-full">
+                    <Link to="/member/membership">Manage my membership</Link>
+                  </Button>
+                ) : (
+                  <Button
+                    className="mt-4 w-full"
+                    disabled={enroll.isPending && enroll.variables === plan.id}
+                    onClick={() => handleChoosePlan(plan.id)}
+                  >
+                    {enroll.isPending && enroll.variables === plan.id && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Choose this plan
+                  </Button>
+                )}
               </div>
             ))}
           </div>
@@ -301,6 +368,13 @@ function MembershipPage() {
           </div>
         </div>
       </section>
+
+      <AuthPromptDialog
+        open={authPromptOpen}
+        onOpenChange={setAuthPromptOpen}
+        message="You need a Forever Timeshare account to enroll in a plan. Register or sign in, then come back to choose your membership."
+        redirectTo="/membership"
+      />
     </>
   );
 }

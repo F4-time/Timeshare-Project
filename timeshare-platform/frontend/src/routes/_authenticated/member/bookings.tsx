@@ -24,7 +24,10 @@ const STATUS_TONE: Record<string, string> = {
 };
 
 function BookingsPage() {
-  const { data, isLoading, error } = useQuery({ queryKey: ["my-bookings"], queryFn: listMyBookings });
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["my-bookings"],
+    queryFn: listMyBookings,
+  });
 
   if (isLoading) {
     return (
@@ -95,7 +98,9 @@ function BookingCard({ booking, cancellable }: { booking: BookingRow; cancellabl
   const qc = useQueryClient();
 
   const cancel = useMutation({
-    mutationFn: () => cancelBooking(booking.id, "Cancelled by member"),
+    mutationFn: async () => {
+      await cancelBooking(booking.id, "Cancelled by member");
+    },
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ["my-bookings"] });
       await qc.invalidateQueries({ queryKey: ["member-overview"] });

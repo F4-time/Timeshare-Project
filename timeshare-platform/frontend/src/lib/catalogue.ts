@@ -1,3 +1,5 @@
+import { queryOptions } from "@tanstack/react-query";
+
 import { supabase } from "@/integrations/supabase/client";
 
 export type Resort = {
@@ -50,6 +52,12 @@ export async function listResorts(): Promise<Resort[]> {
   if (error) throw new Error(error.message);
   return (data ?? []) as Resort[];
 }
+
+/** Shared cache entry so the destinations grid and property page never double-fetch. */
+export const resortsQueryOptions = queryOptions({
+  queryKey: ["public-resorts"],
+  queryFn: listResorts,
+});
 
 export async function listMembershipPlans(): Promise<MembershipPlan[]> {
   const { data, error } = await supabase

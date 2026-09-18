@@ -11,7 +11,12 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import emblem from "@/assets/ft-emblem.png";
 
+type AuthSearch = { redirect?: string };
+
 export const Route = createFileRoute("/auth")({
+  validateSearch: (search: Record<string, unknown>): AuthSearch => ({
+    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Sign in — Forever Timeshare Member & Owner Portal" },
@@ -36,6 +41,7 @@ function errorMessage(error: unknown) {
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { redirect } = Route.useSearch();
   const [busy, setBusy] = useState(false);
   const [checking, setChecking] = useState(true);
 
@@ -45,14 +51,14 @@ function AuthPage() {
       .getSession()
       .then(({ data }) => {
         if (!active) return;
-        if (data.session) navigate({ to: "/portal", replace: true });
+        if (data.session) navigate({ to: redirect || "/portal", replace: true });
         else setChecking(false);
       })
       .catch(() => active && setChecking(false));
     return () => {
       active = false;
     };
-  }, [navigate]);
+  }, [navigate, redirect]);
 
   async function signIn(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -60,15 +66,15 @@ function AuthPage() {
     setBusy(true);
     try {
       const { error } = await supabase.auth.signInWithPassword({
-        email: String(form.get("email")),
-        password: String(form.get("password")),
+        email: String(form.get("email")).trim(),
+        password: String(form.get("password")).trim(),
       });
       if (error) {
         toast.error(error.message);
         return;
       }
       recordLogin();
-      navigate({ to: "/portal", replace: true });
+      navigate({ to: redirect || "/portal", replace: true });
     } catch (error) {
       toast.error(errorMessage(error));
     } finally {
@@ -85,7 +91,7 @@ function AuthPage() {
         email: String(form.get("email")),
         password: String(form.get("password")),
         options: {
-          emailRedirectTo: `${window.location.origin}/portal`,
+          emailRedirectTo: `${window.location.origin}${redirect || "/portal"}`,
           data: { full_name: String(form.get("full_name") ?? "") },
         },
       });
@@ -97,7 +103,7 @@ function AuthPage() {
       if (data.session) {
         recordLogin();
         toast.success("Welcome to Forever Timeshare.");
-        navigate({ to: "/portal", replace: true });
+        navigate({ to: redirect || "/portal", replace: true });
         return;
       }
       toast.success("Account created. Check your inbox to confirm your email.");

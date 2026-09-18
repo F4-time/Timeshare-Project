@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
   BadgeCheck,
@@ -27,7 +28,9 @@ import destIgatpuri from "@/assets/dest-igatpuri.jpg";
 import destMahabaleshwar from "@/assets/dest-mahabaleshwar.jpg";
 import destAlibaug from "@/assets/dest-alibaug.jpg";
 import destMurud from "@/assets/dest-murud.jpg";
+import resortTuscany from "@/assets/resort-tuscany.jpg";
 import { Reveal } from "@/components/Reveal";
+import { resortsQueryOptions } from "@/lib/catalogue";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -57,15 +60,20 @@ const BENEFITS = [
   { icon: Headphones, title: "24x7 Support", copy: "We are always here for you" },
 ];
 
-const DESTINATIONS = [
-  { name: "Lonavala", price: "₹2,999", image: destLonavala },
-  { name: "Karjat", price: "₹2,499", image: destKarjat },
-  { name: "Vasind", price: "₹2,299", image: vasindResort },
-  { name: "Igatpuri", price: "₹1,999", image: destIgatpuri },
-  { name: "Mahabaleshwar", price: "₹3,499", image: destMahabaleshwar },
-  { name: "Alibaug", price: "₹3,999", image: destAlibaug },
-  { name: "Murud", price: "₹2,799", image: destMurud },
-];
+/** Bundled artwork per resort, used until the database carries an image_url. */
+const FALLBACK_IMAGES: Record<string, string> = {
+  lonavala: destLonavala,
+  karjat: destKarjat,
+  vasind: vasindResort,
+  igatpuri: destIgatpuri,
+  mahabaleshwar: destMahabaleshwar,
+  alibaug: destAlibaug,
+  murud: destMurud,
+};
+
+function imageFor(slug: string | null, imageUrl: string | null) {
+  return imageUrl ?? (slug ? FALLBACK_IMAGES[slug] : undefined) ?? resortTuscany;
+}
 
 const STATS = [
   { icon: Users, value: "20,000+", label: "Happy Families" },
@@ -83,6 +91,8 @@ const SEARCH_FIELDS = [
 ];
 
 function HomePage() {
+  const { data: resorts } = useQuery(resortsQueryOptions);
+
   return (
     <main>
       {/* Hero */}
@@ -256,12 +266,16 @@ function HomePage() {
           </h2>
         </Reveal>
         <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
-          {DESTINATIONS.map((d, i) => (
-            <Reveal key={d.name} delay={i * 80}>
-              <Link to="/resorts" className="group card-luxe overflow-hidden rounded-xl shadow-sm">
+          {(resorts ?? []).map((d, i) => (
+            <Reveal key={d.id} delay={i * 80}>
+              <Link
+                to={d.slug ? "/resorts/$slug" : "/resorts"}
+                params={d.slug ? { slug: d.slug } : undefined}
+                className="group card-luxe overflow-hidden rounded-xl shadow-sm"
+              >
                 <div className="aspect-4/3 overflow-hidden">
                   <img
-                    src={d.image}
+                    src={imageFor(d.slug, d.image_url)}
                     alt={`${d.name} resort destination`}
                     width={900}
                     height={700}
@@ -271,7 +285,7 @@ function HomePage() {
                 </div>
                 <div className="p-3">
                   <div className="text-sm font-semibold">{d.name}</div>
-                  <div className="text-xs text-muted-foreground">From {d.price} / night</div>
+                  <div className="text-xs text-muted-foreground">{d.location ?? d.country ?? "India"}</div>
                 </div>
               </Link>
             </Reveal>

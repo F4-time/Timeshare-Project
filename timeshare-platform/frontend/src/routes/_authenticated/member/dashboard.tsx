@@ -4,6 +4,7 @@ import { BadgeCheck, CalendarDays, FileText, Loader2, Palmtree, Wallet } from "l
 
 import { PortalPage } from "@/components/portal/PortalShell";
 import { InfoRow, StatCard } from "@/components/portal/PortalWidgets";
+import { ContinueBookingBanner } from "@/components/ContinueBookingBanner";
 import { useAccount } from "@/hooks/useAccount";
 import { fetchMemberOverview, inr } from "@/lib/portal-queries";
 
@@ -32,6 +33,8 @@ function MemberDashboard() {
       title={`Welcome back, ${name}`}
       description="Your membership, entitlement balance and holidays in one place."
     >
+      <ContinueBookingBanner />
+
       {isLoading ? (
         <div className="flex justify-center py-16">
           <Loader2 className="h-6 w-6 animate-spin text-accent" />
@@ -81,7 +84,6 @@ function MemberDashboard() {
                 <InfoRow label="Member code" value={account?.member?.member_code ?? "—"} />
                 <InfoRow label="Email" value={account?.profile?.email ?? "—"} />
                 <InfoRow label="Roles" value={account?.roles.join(", ") || "—"} />
-                <InfoRow label="Documents" value={String(data?.documentCount ?? 0)} />
               </dl>
               <Link
                 to="/member/membership"

@@ -1,13 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { BadgeCheck, CalendarClock, Loader2, Moon, Sparkles, Wallet } from "lucide-react";
+import { toast } from "sonner";
 
 import { PortalPage } from "@/components/portal/PortalShell";
 import { StatCard } from "@/components/portal/PortalWidgets";
 import { RouteError } from "@/components/RouteStates";
+import { ContinueBookingBanner } from "@/components/ContinueBookingBanner";
 import { Button } from "@/components/ui/button";
 import { useAccount } from "@/hooks/useAccount";
-import { fetchMyMembership, REASON_LABEL } from "@/lib/membership";
+import { listMembershipPlans, money } from "@/lib/catalogue";
+import { enrollInPlan, fetchMyMembership, REASON_LABEL } from "@/lib/membership";
 import { formatDate, inr } from "@/lib/booking-api";
 
 export const Route = createFileRoute("/_authenticated/member/membership")({
@@ -50,16 +53,8 @@ function MembershipPage() {
 
   if (!data?.member || !plan) {
     return (
-      <PortalPage title="My membership">
-        <div className="rounded-xl border border-dashed border-border bg-background p-10 text-center">
-          <p className="text-sm text-muted-foreground">
-            No membership is linked to your account yet. Once your contract is processed it will
-            appear here with your allowance and benefits.
-          </p>
-          <Button asChild variant="outline" className="mt-4">
-            <Link to="/membership">See the plans</Link>
-          </Button>
-        </div>
+      <PortalPage title="My membership" description="Choose a plan to start earning your annual allowance.">
+        <EnrollmentPicker />
       </PortalPage>
     );
   }
@@ -71,7 +66,8 @@ function MembershipPage() {
 
   return (
     <PortalPage title={plan.name} description={plan.description ?? "Your plan, allowance and history."}>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <ContinueBookingBanner />
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard
           icon={BadgeCheck}
           label="Tier"
@@ -91,6 +87,11 @@ function MembershipPage() {
           icon={CalendarClock}
           label="Booking window"
           value={`${plan.booking_window_days} days`}
+        />
+        <StatCard
+          icon={Wallet}
+          label="Remaining amount"
+          value={data.remainingFees ? inr.format(data.remainingFees) : "None"}
         />
       </div>
 
@@ -199,7 +200,21 @@ function MembershipPage() {
                       </td>
                       <td className="py-2">{REASON_LABEL[l.reason] ?? l.reason}</td>
                       <td className="hidden py-2 text-muted-foreground sm:table-cell">
-                        {l.notes ?? "—"}
+                        {l.booking ? (
+                          <>
+                            <div className="text-foreground">
+                              {[l.booking.roomTypeName, l.booking.resortName].filter(Boolean).join(" · ") ||
+                                l.notes ||
+                                "—"}
+                            </div>
+                            <div className="text-xs">
+                              {l.notes}
+                              {l.booking.totalFees ? ` · ${inr.format(l.booking.totalFees)} fees deducted` : ""}
+                            </div>
+                          </>
+                        ) : (
+                          (l.notes ?? "—")
+                        )}
                       </td>
                       <td
                         className={
@@ -234,6 +249,74 @@ function Row({ label, value }: { label: string; value: string }) {
     <div className="flex justify-between gap-4">
       <dt className="text-muted-foreground">{label}</dt>
       <dd className="truncate text-right capitalize">{value}</dd>
+    </div>
+  );
+}
+
+function EnrollmentPicker() {
+  const qc = useQueryClient();
+  const plans = useQuery({ queryKey: ["public-plans"], queryFn: listMembershipPlans });
+
+  const enroll = useMutation({
+    mutationFn: (planId: string) => enrollInPlan(planId),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ["my-membership"] });
+      await qc.invalidateQueries({ queryKey: ["account"] });
+      await qc.invalidateQueries({ queryKey: ["member-overview"] });
+      toast.success("Membership activated — your allowance is ready to use.");
+    },
+    onError: (e: Error) => {
+      toast.error(e.message);
+    },
+  });
+
+  if (plans.isLoading) {
+    return (
+      <div className="flex justify-center py-16">
+        <Loader2 className="h-6 w-6 animate-spin text-accent" />
+      </div>
+    );
+  }
+
+  if (!plans.data?.length) {
+    return (
+      <div className="rounded-xl border border-dashed border-border bg-background p-10 text-center">
+        <p className="text-sm text-muted-foreground">
+          No membership is linked to your account yet, and no plans are available to enroll in right
+          now. Please check back shortly.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {plans.data.map((plan) => (
+        <article key={plan.id} className="flex flex-col rounded-xl border border-border bg-background p-5">
+          <p className="text-xs uppercase tracking-widest text-accent">
+            {plan.benefits?.cadence ?? plan.benefits?.tier ?? "Plan"}
+          </p>
+          <h3 className="mt-2 font-serif text-lg">{plan.name}</h3>
+          <p className="mt-2 flex-1 text-sm text-muted-foreground">
+            {plan.annual_nights
+              ? `${plan.annual_nights} nights every year`
+              : plan.annual_points
+                ? `${plan.annual_points.toLocaleString("en-IN")} points every year`
+                : ""}
+          </p>
+          <p className="mt-3 text-sm font-medium">{money(plan.price, plan.currency)}</p>
+          <Button
+            className="mt-4 w-full"
+            disabled={enroll.isPending && enroll.variables === plan.id}
+            onClick={() => enroll.mutate(plan.id)}
+          >
+            {enroll.isPending && enroll.variables === plan.id && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Choose this plan
+          </Button>
+        </article>
+      ))}
     </div>
   );
 }

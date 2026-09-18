@@ -1,6 +1,8 @@
 import { Router } from "express";
+import { z } from "zod";
 
 import { requireAuth } from "../middleware/auth.js";
+import { HttpError } from "../middleware/error.js";
 import { supabaseAdmin, supabaseForUser } from "../supabase.js";
 
 export const accountRouter = Router();
@@ -58,6 +60,37 @@ accountRouter.post("/login-event", requireAuth, async (req, res, next) => {
       return;
     }
     res.status(201).json({ recorded: true, sessionId: data.id });
+  } catch (err) {
+    next(err);
+  }
+});
+
+const enrollSchema = z.object({ planId: z.string().uuid() });
+
+/**
+ * Self-service enrollment. Runs the admin onboarding routine with the service
+ * role so it bypasses the members.write permission check — admin_onboard_member
+ * only skips that check when auth.uid() is NULL, which is true for this client.
+ * The caller can only ever enroll themselves: _user_id comes from their verified
+ * token, never from the request body.
+ */
+accountRouter.post("/enroll", requireAuth, async (req, res, next) => {
+  try {
+    const parsed = enrollSchema.safeParse(req.body);
+    if (!parsed.success) {
+      throw new HttpError(400, parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; "));
+    }
+
+    const { data, error } = await supabaseAdmin.rpc("admin_onboard_member", {
+      _user_id: req.auth!.userId,
+      _plan_id: parsed.data.planId,
+    });
+    if (error) {
+      if (error.code === "P0002") throw new HttpError(404, error.message);
+      throw new HttpError(409, error.message);
+    }
+
+    res.status(201).json(data?.[0] ?? data);
   } catch (err) {
     next(err);
   }
