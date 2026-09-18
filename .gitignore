@@ -24,6 +24,7 @@ dist-ssr
 # SSH/deploy private keys — never commit
 *.pem
 *.key
+*.ppk
 
 # Lovable reference app at the repo root — kept locally as a design reference,
 # not part of this repository. Leading "/" anchors these to the root only, so
