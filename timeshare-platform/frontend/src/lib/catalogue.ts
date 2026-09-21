@@ -10,6 +10,8 @@ export type Resort = {
   location: string | null;
   country: string | null;
   image_url: string | null;
+  /** Extra photos beyond the cover `image_url`. */
+  gallery: string[] | null;
   amenities: { items?: string[] } | null;
 };
 
@@ -47,7 +49,7 @@ export type MembershipPlan = {
 export async function listResorts(): Promise<Resort[]> {
   const { data, error } = await supabase
     .from("resorts")
-    .select("id, slug, name, description, location, country, image_url, amenities")
+    .select("id, slug, name, description, location, country, image_url, gallery, amenities")
     .order("name");
   if (error) throw new Error(error.message);
   return (data ?? []) as Resort[];

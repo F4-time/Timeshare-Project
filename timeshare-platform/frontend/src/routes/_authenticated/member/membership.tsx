@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { BadgeCheck, CalendarClock, Loader2, Moon, Sparkles, Wallet } from "lucide-react";
+import { BadgeCheck, CalendarClock, Loader2, Moon, PiggyBank, Sparkles, Wallet } from "lucide-react";
 import { toast } from "sonner";
 
 import { PortalPage } from "@/components/portal/PortalShell";
@@ -63,11 +63,12 @@ function MembershipPage() {
   const allowance = isPoints ? (plan.annual_points ?? 0) : (plan.annual_nights ?? 0);
   const unit = isPoints ? "points" : "nights";
   const current = data.entitlements[0];
+  const amountRemaining = Math.max(plan.price - data.remainingFees, 0);
 
   return (
     <PortalPage title={plan.name} description={plan.description ?? "Your plan, allowance and history."}>
       <ContinueBookingBanner />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <StatCard
           icon={BadgeCheck}
           label="Tier"
@@ -90,8 +91,13 @@ function MembershipPage() {
         />
         <StatCard
           icon={Wallet}
-          label="Remaining amount"
+          label="Amount deducted"
           value={data.remainingFees ? inr.format(data.remainingFees) : "None"}
+        />
+        <StatCard
+          icon={PiggyBank}
+          label="Amount remains"
+          value={inr.format(amountRemaining)}
         />
       </div>
 

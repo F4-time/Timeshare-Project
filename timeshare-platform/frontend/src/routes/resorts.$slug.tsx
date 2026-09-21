@@ -102,6 +102,10 @@ function PropertyView({ resort }: { resort: Resort }) {
   const [bookingOption, setBookingOption] = useState<RoomOption | null>(null);
   const [authPromptOpen, setAuthPromptOpen] = useState(false);
 
+  // Cover photo plus any gallery extras, de-duplicated so a repeated URL doesn't show twice.
+  const photos = [...new Set([imageFor(resort.slug, resort.image_url), ...(resort.gallery ?? [])])];
+  const [activePhoto, setActivePhoto] = useState(0);
+
   // Nudge to the next window of the same length so the visitor doesn't have to guess new dates by hand.
   function handleTryDifferentDates() {
     const nights = Math.max(
@@ -157,11 +161,28 @@ function PropertyView({ resort }: { resort: Resort }) {
         <div className="lg:col-span-2">
           <div className="aspect-16/9 w-full overflow-hidden rounded-xl bg-muted shadow-luxe">
             <img
-              src={imageFor(resort.slug, resort.image_url)}
+              src={photos[Math.min(activePhoto, photos.length - 1)]}
               alt={resort.name}
               className="h-full w-full object-cover"
             />
           </div>
+          {photos.length > 1 && (
+            <div className="mt-3 flex gap-2 overflow-x-auto">
+              {photos.map((src, i) => (
+                <button
+                  key={`${src}-${i}`}
+                  type="button"
+                  onClick={() => setActivePhoto(i)}
+                  className={`h-16 w-24 shrink-0 overflow-hidden rounded-md border-2 transition-colors ${
+                    i === activePhoto ? "border-accent" : "border-transparent"
+                  }`}
+                  aria-label={`Show photo ${i + 1}`}
+                >
+                  <img src={src} alt={`${resort.name} ${i + 1}`} className="h-full w-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
 
           <h2 className="mt-8 font-serif text-xl">About Property</h2>
           <p className="mt-2 flex items-center gap-1 text-xs uppercase tracking-widest text-muted-foreground">
@@ -308,8 +329,6 @@ function PropertyView({ resort }: { resort: Resort }) {
         option={bookingOption}
         onOpenChange={(open) => !open && setBookingOption(null)}
         resortId={resort.id}
-        resortName={resort.name}
-        resortLocation={resort.location ?? null}
         checkIn={checkIn}
         checkOut={checkOut}
         adults={adults}
@@ -364,8 +383,6 @@ function GuestDetailsDialog({
   onOpenChange,
   option,
   resortId,
-  resortName,
-  resortLocation,
   checkIn,
   checkOut,
   adults,
@@ -376,8 +393,6 @@ function GuestDetailsDialog({
   onOpenChange: (open: boolean) => void;
   option: RoomOption | null;
   resortId: string;
-  resortName: string;
-  resortLocation: string | null;
   checkIn: string;
   checkOut: string;
   adults: number;

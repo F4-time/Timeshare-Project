@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Loader2, Plus, Pencil } from "lucide-react";
+import { Loader2, Plus, Pencil, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { PortalPage } from "@/components/portal/PortalShell";
@@ -46,6 +46,7 @@ const EMPTY: ResortInput = {
   country: "India",
   description: "",
   image_url: "",
+  gallery: [],
   amenities: "",
 };
 
@@ -66,6 +67,7 @@ function ResortDialog({
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [galleryUrl, setGalleryUrl] = useState("");
   const [form, setForm] = useState<ResortInput>(
     resort
       ? {
@@ -76,6 +78,7 @@ function ResortDialog({
           country: resort.country ?? "India",
           description: resort.description ?? "",
           image_url: resort.image_url ?? "",
+          gallery: resort.gallery ?? [],
           amenities: resort.amenities?.items?.join(", ") ?? "",
         }
       : EMPTY,
@@ -95,6 +98,33 @@ function ResortDialog({
     } finally {
       setUploading(false);
     }
+  }
+
+  async function handleGalleryFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = "";
+    if (!files.length) return;
+    setUploading(true);
+    try {
+      const urls = await Promise.all(files.map((file) => uploadResortImage(file, form.slug || slugify(form.name))));
+      setForm((f) => ({ ...f, gallery: [...f.gallery, ...urls] }));
+      toast.success(files.length > 1 ? `${files.length} images uploaded` : "Image uploaded");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function addGalleryUrl() {
+    const url = galleryUrl.trim();
+    if (!url) return;
+    setForm((f) => ({ ...f, gallery: [...f.gallery, url] }));
+    setGalleryUrl("");
+  }
+
+  function removeGalleryImage(index: number) {
+    setForm((f) => ({ ...f, gallery: f.gallery.filter((_, i) => i !== index) }));
   }
 
   const mutation = useMutation({
@@ -209,6 +239,47 @@ function ResortDialog({
             <p className="text-xs text-muted-foreground">
               Leave blank to use the bundled artwork matched by slug.
             </p>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="gallery-upload">Gallery (additional photos)</Label>
+            {form.gallery.length > 0 && (
+              <div className="grid grid-cols-3 gap-2">
+                {form.gallery.map((url, i) => (
+                  <div key={`${url}-${i}`} className="group relative">
+                    <img src={url} alt={`Gallery ${i + 1}`} className="h-20 w-full rounded-md object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removeGalleryImage(i)}
+                      className="absolute -right-1.5 -top-1.5 rounded-full bg-foreground p-0.5 text-background opacity-0 transition-opacity group-hover:opacity-100"
+                      aria-label={`Remove gallery image ${i + 1}`}
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <Input
+              id="gallery-upload"
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleGalleryFileSelect}
+              disabled={uploading}
+            />
+            {uploading && <p className="text-xs text-muted-foreground">Uploading…</p>}
+            <div className="flex gap-2">
+              <Input
+                value={galleryUrl}
+                onChange={(e) => setGalleryUrl(e.target.value)}
+                placeholder="https://… (or upload files above)"
+              />
+              <Button type="button" variant="outline" onClick={addGalleryUrl} disabled={!galleryUrl.trim()}>
+                Add
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">Shown alongside the cover image on the property page.</p>
           </div>
         </div>
 

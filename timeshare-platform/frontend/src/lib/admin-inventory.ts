@@ -14,6 +14,8 @@ export type AdminResort = {
   location: string | null;
   country: string | null;
   image_url: string | null;
+  /** Extra photos beyond the cover `image_url`, shown as a gallery on the property page. */
+  gallery: string[] | null;
   amenities: { items?: string[] } | null;
 };
 
@@ -45,7 +47,7 @@ function assertOk(error: { message: string } | null) {
 export async function listResortsAdmin(): Promise<AdminResort[]> {
   const { data, error } = await supabase
     .from("resorts")
-    .select("id, slug, name, description, location, country, image_url, amenities")
+    .select("id, slug, name, description, location, country, image_url, gallery, amenities")
     .order("name");
   assertOk(error);
   return (data ?? []) as AdminResort[];
@@ -54,7 +56,7 @@ export async function listResortsAdmin(): Promise<AdminResort[]> {
 export async function getResort(id: string): Promise<AdminResort | null> {
   const { data, error } = await supabase
     .from("resorts")
-    .select("id, slug, name, description, location, country, image_url, amenities")
+    .select("id, slug, name, description, location, country, image_url, gallery, amenities")
     .eq("id", id)
     .maybeSingle();
   assertOk(error);
@@ -69,6 +71,8 @@ export type ResortInput = {
   country: string;
   description: string;
   image_url: string;
+  /** Extra photos beyond the cover `image_url`. */
+  gallery: string[];
   /** Comma-separated list; split into the `amenities.items` JSON array on save. */
   amenities: string;
 };
@@ -85,6 +89,7 @@ export async function saveResort(input: ResortInput) {
     country: input.country.trim() || "India",
     description: input.description.trim() || null,
     image_url: input.image_url.trim() || null,
+    gallery: input.gallery.filter(Boolean),
     amenities: { items: amenityItems },
   };
   const { error } = input.id
