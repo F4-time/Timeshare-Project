@@ -13,7 +13,7 @@ export type Account = {
   } | null;
   roles: AppRole[];
   member: { id: string; member_code: string; status: string } | null;
-  owner: { id: string; owner_code: string; status: string } | null;
+  owner: { id: string; owner_code: string; status: string; resort_id: string | null } | null;
 };
 
 export const ADMIN_ROLES: AppRole[] = ["ADMIN_STAFF", "SUPER_ADMIN", "RESORT_STAFF"];

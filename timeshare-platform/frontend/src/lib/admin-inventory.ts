@@ -17,6 +17,10 @@ export type AdminResort = {
   /** Extra photos beyond the cover `image_url`, shown as a gallery on the property page. */
   gallery: string[] | null;
   amenities: { items?: string[] } | null;
+  /** Contact details for the party who owns this resort/villa — admin-only, never shown publicly. */
+  owner_name: string | null;
+  owner_phone: string | null;
+  owner_email: string | null;
 };
 
 export type AdminRoomType = {
@@ -44,11 +48,11 @@ function assertOk(error: { message: string } | null) {
   if (error) throw new Error(error.message);
 }
 
+const ADMIN_RESORT_COLUMNS =
+  "id, slug, name, description, location, country, image_url, gallery, amenities, owner_name, owner_phone, owner_email";
+
 export async function listResortsAdmin(): Promise<AdminResort[]> {
-  const { data, error } = await supabase
-    .from("resorts")
-    .select("id, slug, name, description, location, country, image_url, gallery, amenities")
-    .order("name");
+  const { data, error } = await supabase.from("resorts").select(ADMIN_RESORT_COLUMNS).order("name");
   assertOk(error);
   return (data ?? []) as AdminResort[];
 }
@@ -56,7 +60,7 @@ export async function listResortsAdmin(): Promise<AdminResort[]> {
 export async function getResort(id: string): Promise<AdminResort | null> {
   const { data, error } = await supabase
     .from("resorts")
-    .select("id, slug, name, description, location, country, image_url, gallery, amenities")
+    .select(ADMIN_RESORT_COLUMNS)
     .eq("id", id)
     .maybeSingle();
   assertOk(error);
@@ -75,6 +79,10 @@ export type ResortInput = {
   gallery: string[];
   /** Comma-separated list; split into the `amenities.items` JSON array on save. */
   amenities: string;
+  owner_name: string;
+  owner_phone: string;
+  owner_email: string;
+  ownerId: string;
 };
 
 export async function saveResort(input: ResortInput) {
@@ -91,11 +99,25 @@ export async function saveResort(input: ResortInput) {
     image_url: input.image_url.trim() || null,
     gallery: input.gallery.filter(Boolean),
     amenities: { items: amenityItems },
+    owner_name: input.owner_name.trim() || null,
+    owner_phone: input.owner_phone.trim() || null,
+    owner_email: input.owner_email.trim() || null,
   };
-  const { error } = input.id
-    ? await supabase.from("resorts").update(payload).eq("id", input.id)
-    : await supabase.from("resorts").insert(payload);
+  const resortResult = input.id
+    ? await supabase.from("resorts").update(payload).eq("id", input.id).select("id").single()
+    : await supabase.from("resorts").insert(payload).select("id").single();
+  const { data: resort, error } = resortResult;
   assertOk(error);
+  if (!resort) throw new Error("Could not save resort");
+
+  const { error: clearLinksError } = await supabase.from("owner_resorts").delete().eq("resort_id", resort.id);
+  assertOk(clearLinksError);
+  if (input.ownerId) {
+    const { error: linkError } = await supabase
+      .from("owner_resorts")
+      .insert({ owner_id: input.ownerId, resort_id: resort.id });
+    assertOk(linkError);
+  }
 }
 
 /** Uploads an image to the public `resort-images` bucket and returns its public URL. */
@@ -203,4 +225,25 @@ export async function unitNightCounts(resortId: string) {
     counts.set(u.id, { available, booked });
   }
   return counts;
+}
+
+/** Snapshot of a resort's rooms right now, for the admin Owners tab ("is his room booked or not"). */
+export async function getResortOccupancy(resortId: string): Promise<{ bookedUnits: number; totalUnits: number }> {
+  const units = await listUnits(resortId);
+  if (units.length === 0) return { bookedUnits: 0, totalUnits: 0 };
+
+  const today = new Date().toISOString().slice(0, 10);
+  const { data, error } = await supabase
+    .from("availability")
+    .select("resort_unit_id")
+    .eq("stay_date", today)
+    .eq("status", "booked")
+    .in(
+      "resort_unit_id",
+      units.map((u) => u.id),
+    );
+  assertOk(error);
+
+  const bookedUnitIds = new Set((data ?? []).map((row) => row.resort_unit_id as string));
+  return { bookedUnits: bookedUnitIds.size, totalUnits: units.length };
 }

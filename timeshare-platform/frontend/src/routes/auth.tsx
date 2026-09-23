@@ -114,26 +114,6 @@ function AuthPage() {
     }
   }
 
-  async function resetPassword(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = new FormData(e.currentTarget);
-    setBusy(true);
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(String(form.get("email")), {
-        redirectTo: `${window.location.origin}/auth`,
-      });
-      if (error) {
-        toast.error(error.message);
-        return;
-      }
-      toast.success("Reset link sent if that email is registered.");
-    } catch (error) {
-      toast.error(errorMessage(error));
-    } finally {
-      setBusy(false);
-    }
-  }
-
   if (checking) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -162,7 +142,7 @@ function AuthPage() {
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="signin">Sign in</TabsTrigger>
               <TabsTrigger value="signup">Register</TabsTrigger>
-              <TabsTrigger value="reset">Reset</TabsTrigger>
+              <TabsTrigger value="owner">Owner</TabsTrigger>
             </TabsList>
 
             <TabsContent value="signin">
@@ -192,11 +172,12 @@ function AuthPage() {
               </form>
             </TabsContent>
 
-            <TabsContent value="reset">
-              <form className="space-y-4 pt-4" onSubmit={resetPassword}>
-                <Field icon={Mail} id="rs-email" name="email" type="email" label="Email" />
+            <TabsContent value="owner">
+              <form className="space-y-4 pt-4" onSubmit={signIn}>
+                <Field icon={Mail} id="owner-email" name="email" type="email" label="Owner email" />
+                <Field icon={Lock} id="owner-password" name="password" type="password" label="Password" />
                 <Button type="submit" className="w-full" disabled={busy}>
-                  {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Send reset link
+                  {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Open owner portal
                 </Button>
               </form>
             </TabsContent>

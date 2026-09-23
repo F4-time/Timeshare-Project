@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { BarChart3, Building2, LayoutDashboard, LifeBuoy, Users } from "lucide-react";
+import { BarChart3, Building2, KeyRound, LayoutDashboard, LifeBuoy, Users } from "lucide-react";
 
 import { PortalShell, type PortalNavItem } from "@/components/portal/PortalShell";
 import { RoleGate } from "@/components/portal/RoleGate";
@@ -10,6 +10,7 @@ const NAV: PortalNavItem[] = [
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/admin/members", label: "Members", icon: Users },
   { to: "/admin/resorts", label: "Resorts & Inventory", icon: Building2 },
+  { to: "/admin/owners", label: "Owners", icon: KeyRound },
   { to: "/admin/support", label: "Support", icon: LifeBuoy },
 ];
 

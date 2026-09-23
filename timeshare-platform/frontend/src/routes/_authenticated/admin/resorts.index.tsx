@@ -25,6 +25,7 @@ import {
   type AdminResort,
   type ResortInput,
 } from "@/lib/admin-inventory";
+import { listOwners, type AdminOwner } from "@/lib/owner-accounts";
 
 const resortsQuery = queryOptions({
   queryKey: ["admin-resorts"],
@@ -48,6 +49,10 @@ const EMPTY: ResortInput = {
   image_url: "",
   gallery: [],
   amenities: "",
+  owner_name: "",
+  owner_phone: "",
+  owner_email: "",
+  ownerId: "",
 };
 
 function slugify(value: string) {
@@ -60,9 +65,11 @@ function slugify(value: string) {
 function ResortDialog({
   resort,
   trigger,
+  owners,
 }: {
   resort?: AdminResort;
   trigger: React.ReactNode;
+  owners: AdminOwner[];
 }) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
@@ -80,6 +87,10 @@ function ResortDialog({
           image_url: resort.image_url ?? "",
           gallery: resort.gallery ?? [],
           amenities: resort.amenities?.items?.join(", ") ?? "",
+          owner_name: resort.owner_name ?? "",
+          owner_phone: resort.owner_phone ?? "",
+          owner_email: resort.owner_email ?? "",
+          ownerId: owners.find((owner) => owner.resorts.some((assigned) => assigned.id === resort.id))?.id ?? "",
         }
       : EMPTY,
   );
@@ -219,6 +230,33 @@ function ResortDialog({
             <p className="text-xs text-muted-foreground">Comma-separated list, shown as tags to members.</p>
           </div>
 
+          <div className="space-y-3 rounded-lg border border-border p-3">
+            <p className="text-sm font-medium">Resort owner</p>
+            <p className="text-xs text-muted-foreground">
+              Select the owner login account responsible for this resort. One owner can manage multiple resorts.
+            </p>
+            <div className="space-y-1.5">
+              <Label htmlFor="ownerId">Owner name</Label>
+              <select
+                id="ownerId"
+                value={form.ownerId}
+                onChange={(e) => {
+                  const owner = owners.find((candidate) => candidate.id === e.target.value);
+                  setForm((f) => ({
+                    ...f,
+                    ownerId: e.target.value,
+                    owner_name: owner?.name ?? "",
+                    owner_email: owner?.email ?? "",
+                  }));
+                }}
+                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+              >
+                <option value="">No owner assigned</option>
+                {owners.map((owner) => <option key={owner.id} value={owner.id}>{owner.name}</option>)}
+              </select>
+            </div>
+          </div>
+
           <div className="space-y-1.5">
             <Label htmlFor="image">Image</Label>
             {form.image_url && (
@@ -299,6 +337,7 @@ function ResortDialog({
 
 function AdminResortsPage() {
   const { data: resorts } = useSuspenseQuery(resortsQuery);
+  const { data: owners = [] } = useQuery({ queryKey: ["admin-owners"], queryFn: listOwners });
 
   return (
     <PortalPage
@@ -307,6 +346,7 @@ function AdminResortsPage() {
     >
       <div className="mb-4 flex justify-end">
         <ResortDialog
+          owners={owners}
           trigger={
             <Button>
               <Plus className="mr-2 h-4 w-4" /> Add resort
@@ -343,6 +383,7 @@ function AdminResortsPage() {
                   <td className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-2">
                       <ResortDialog
+                        owners={owners}
                         resort={r}
                         trigger={
                           <Button variant="ghost" size="sm">

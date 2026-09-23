@@ -20,7 +20,7 @@ async function fetchAccount(): Promise<Account> {
       .maybeSingle(),
     supabase.from("user_roles").select("role").eq("user_id", userId),
     supabase.from("members").select("id, member_code, status").eq("user_id", userId).maybeSingle(),
-    supabase.from("owners").select("id, owner_code, status").eq("user_id", userId).maybeSingle(),
+    supabase.from("owners").select("id, owner_code, status, resort_id").eq("user_id", userId).maybeSingle(),
   ]);
 
   return {
