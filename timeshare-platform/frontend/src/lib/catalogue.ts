@@ -50,7 +50,7 @@ export async function listResorts(): Promise<Resort[]> {
   const { data, error } = await supabase
     .from("resorts")
     .select("id, slug, name, description, location, country, image_url, gallery, amenities")
-    .neq("name", "Floora Ecostay Lonavala")
+    .neq("name", "Flora Ecostay Lonavala")
     .order("name");
   if (error) throw new Error(error.message);
   return (data ?? []) as Resort[];

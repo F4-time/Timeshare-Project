@@ -4,4 +4,4 @@ ALTER TABLE public.resorts
 
 UPDATE public.resorts
 SET active = false
-WHERE lower(name) = 'floora ecostay lonavala';
+WHERE lower(name) = 'flora ecostay lonavala';

@@ -52,7 +52,11 @@ const ADMIN_RESORT_COLUMNS =
   "id, slug, name, description, location, country, image_url, gallery, amenities, owner_name, owner_phone, owner_email";
 
 export async function listResortsAdmin(): Promise<AdminResort[]> {
-  const { data, error } = await supabase.from("resorts").select(ADMIN_RESORT_COLUMNS).order("name");
+  const { data, error } = await supabase
+    .from("resorts")
+    .select(ADMIN_RESORT_COLUMNS)
+    .neq("name", "Flora Ecostay Lonavala")
+    .order("name");
   assertOk(error);
   return (data ?? []) as AdminResort[];
 }
